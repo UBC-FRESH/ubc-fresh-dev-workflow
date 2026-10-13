@@ -70,6 +70,14 @@ This log records what the first dogfood runs found: the synthetic demo project, 
 - Disposition: **deferred**. Choosing a constraints file or exact pins changes how the project is reproduced, so it needs an ADR before any change.
 - Issue: #26, filed in P1.3.
 
+### F8. The pre-commit hooks run in whichever Python the shell resolves
+
+- Found in: P1.5, at the pre-commit run before the commit.
+- Command: `.venv/bin/pre-commit run --all-files`, run from a shell without `.venv/bin` on `PATH`. Exit status: non-zero.
+- Output: `ModuleNotFoundError: No module named 'numpydoc'` while collecting `tests/test_api_docstrings.py`, and `No module named 'hypothesis'` in `tests/test_properties.py`. The traceback names the system Python.
+- Cause: the hooks use `language: system` and call `python` from `PATH`. A shell without the venv active resolves the system Python, which lacks the dev tools. The setup steps activate the venv, but they do not say that a commit must run from the activated shell.
+- Disposition: **fixed** in the P1.6 commit that adds the note to the setup steps, in `CONTRIBUTING.md` and its seed template. The hook design is unchanged.
+
 ## Validator gaps
 
 | Gap | Source | Disposition |
