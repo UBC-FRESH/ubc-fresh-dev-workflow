@@ -1,0 +1,79 @@
+# AGENTS.md
+
+This file is the working contract for coding agents in {{PROJECT_NAME}}.
+
+{{PROJECT_PURPOSE}}
+
+Keep this file short. Each rule below either checks itself or points to the page that explains it. The workflow rules come from the UBC-FRESH dev workflow, which this project was seeded from. Project-specific rules go at the end, each with its reason.
+
+## Session start
+
+Before you change anything, read in this order:
+
+1. This file.
+2. `ROADMAP.md`: the active phase and its "Detailed Next Steps Notes".
+3. The latest entries in `CHANGE_LOG.md`.
+4. The notes your task names, in `notes/`.
+5. The docs pages that govern your task, in `docs/`.
+
+Cite the pages you relied on in your report.
+
+## Working principles
+
+- **Evidence over trust.** Cite command output, diffs, commit hashes, and URLs.
+- **One bounded move at a time.** Stop and report after each one.
+- **No oracle, no capability.** A new agent-facing capability needs a validator that can fail.
+- **Workflow as scaffold.** Create the parent issue, the branch, and the roadmap entry before the work.
+- **Structured handoff.** Issues, the roadmap, notes, and the changelog carry the state.
+- **Preserve uncertainty.** Say what you did not verify, and why.
+- **Scope discipline.** Stay inside the active phase and task.
+- **Sanitized output.** Keep private data, credentials, raw transcripts, and personal paths out of tracked files.
+
+## Planning workflow
+
+- One phase is one GitHub parent issue and one feature branch, `feature/p<n>-<slug>`.
+- One task is one child issue, linked to the parent as a sub-issue.
+- A subtask is a checklist item in the child issue body. Three levels at most.
+- Keep `ROADMAP.md`, `CHANGE_LOG.md`, `notes/`, issue bodies, and PR descriptions in step.
+
+## Approval gates
+
+You may, within the active phase: create and commit to its branch, push that branch, open and update its issues and pull requests, and run local checks.
+
+You must ask, and wait for an explicit answer, before you: activate a phase; merge a pull request; close a parent issue; create a tag or a release; change repository visibility or settings; create an external account, repository, or server; touch private data or credentials; or delete anything.
+
+## GitHub hygiene
+
+- Audit read-only first: `gh issue list`, `gh issue view <n>`, `gh pr list`.
+- Write bodies and comments to files, and post them with `--body-file`. Never build them from escaped strings.
+- Read back every comment or edit with `gh issue view` before you report it as posted.
+- Post a progress comment when a task or phase milestone completes, and a closeout comment before you close an issue.
+
+## Formatting
+
+- Put section labels on their own lines, such as `Phase identifier: P0`.
+- Use real task-list syntax, one item per line.
+- Wrap branch names, paths, commands, and commit hashes in backticks.
+- Start commit messages with the task ID, for example `P0.1 add license`.
+
+## Verification
+
+Run these before you report a change as done:
+
+```bash
+python -m ruff check .
+python -m pytest
+sphinx-build -b html docs _build/html -W
+python scripts/check_workflow.py
+```
+
+Record the commands and their results in the changelog entry for the milestone.
+
+## Public safety
+
+- No private data, credentials, raw transcripts, unpublished documents, or machine-specific paths in tracked files.
+- Use placeholders, repository-relative paths, or environment variables in examples.
+
+## Project-specific rules
+
+Add domain guardrails here, each with its reason. Keep shared workflow rules out of this section.
