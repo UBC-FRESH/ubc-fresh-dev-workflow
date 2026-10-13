@@ -57,7 +57,7 @@ Rules
 Coverage
 --------
 
-Branch coverage of ``scripts/`` is gated at 90 percent in ``pyproject.toml``. The current
+Branch coverage of ``scripts/`` is gated at 95 percent in ``pyproject.toml``. The current
 suite reaches 100 percent. The gate exists to catch untested code, so a drop below the
 current level is a finding. Do not write tests that run lines without asserting anything
 about them.

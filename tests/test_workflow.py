@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import subprocess
 import sys
+import tomllib
 from pathlib import Path
 
 import check_workflow as cw
@@ -43,3 +44,24 @@ def test_the_repository_gitignore_covers_everything_the_gates_write() -> None:
     rules = cw.load_ignore_rules(ROOT)
     missed = [rel for rel in GATE_WRITES if not cw.is_ignored(rel, is_dir=False, rules=rules)]
     assert missed == []
+
+
+GATE_PAGES: tuple[str, ...] = (
+    "AGENTS.md",
+    "docs/reference/testing-policy.rst",
+    "docs/reference/quality-gates.rst",
+)
+
+
+def test_the_coverage_gate_is_95_percent() -> None:
+    """The pytest run enforces 95 percent branch coverage of scripts/."""
+    config = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    assert "--cov-fail-under=95" in config["tool"]["pytest"]["ini_options"]["addopts"].split()
+
+
+def test_the_pages_that_state_the_coverage_gate_say_95_percent() -> None:
+    """Each page that states the coverage gate gives 95 percent, and none still gives 90."""
+    for rel in GATE_PAGES:
+        text = (ROOT / rel).read_text(encoding="utf-8")
+        assert "95 percent" in text, rel
+        assert "90 percent" not in text, rel

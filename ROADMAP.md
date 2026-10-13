@@ -113,7 +113,7 @@ Goal: prove the seed works end to end on a throwaway project. Run the loop once,
 - [x] P1.2 Fresh-clone rehearsal of this repository's checks (#19)
 - [x] P1.3 Friction log, fixes, and validator gap list (#20)
 - [x] P1.4 Walk mode honors the root `.gitignore`, with a test (#21)
-- [ ] P1.5 Coverage gate ratchet to 95 percent (#22)
+- [x] P1.5 Coverage gate ratchet to 95 percent (#22)
 - [ ] P1.6 Close-out rehearsal on the demo project (#23)
 
 Acceptance criteria:
@@ -184,10 +184,10 @@ Goal: keep the seed current: triage incoming ideas, review it on a cadence, and 
 ## Detailed Next Steps Notes
 
 1. Phase 0 is complete. Pull request #17 merged as `2943d83`, GitHub Pages is live, branch protection requires the four CI checks on `main`, and #1 is closed.
-2. Phase 1 is active. Its child tasks are #18 to #23, under the parent #9. P1.1 to P1.4 are complete. Their records are on #18 to #21. The findings deferred from the dogfood log are on #24, #25, and #26. P1.5, the coverage gate ratchet to 95 percent (#22), is next.
+2. Phase 1 is active. Its child tasks are #18 to #23, under the parent #9. P1.1 to P1.5 are complete. Their records are on #18 to #22. The findings deferred from the dogfood log are on #24, #25, and #26. P1.6, the close-out rehearsal on the demo project (#23), is next.
 3. Phase 1 closes with its own close-out report, `notes/reports/p1-closeout.md`, queued in a pull request. The maintainer approves the report. Then the agent squash-merges the pull request, closes #9, and deletes the branch.
 4. Recommended defaults, as approved with the Phase 0 close-out. The Phase 1 report can change them:
    - Seed issue forms (YAML) stay deferred. The default is Markdown templates, until the friction log shows the need.
    - `scripts/new_project.py` keeps writing local files only. Creating a repository stays a separate approved action.
    - The seed carries the MIT license.
-   - The coverage gate is 90 percent through P0. P1.5 raises it to 95 percent.
+   - The coverage gate is 90 percent through P0. P1.5 raised it to 95 percent.
