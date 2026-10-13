@@ -627,3 +627,11 @@ def test_failed_listing_falls_back_to_walking(
 
     monkeypatch.setattr(subprocess, "run", fake_run)
     assert "CONTROL-CHAR" in error_codes(root)
+
+
+def test_walked_trees_skip_generated_caches(tmp_path: Path) -> None:
+    """A walked tree skips generated caches, such as a Hypothesis cache."""
+    root = make_repo(tmp_path)
+    write(root, ".hypothesis/constants/cache", f"Runner path {HOME_PREFIX}runner/work\n")
+    write(root, "runtime/dashboard.md", f"Runner path {HOME_PREFIX}runner/work\n")
+    assert error_codes(root) == set()

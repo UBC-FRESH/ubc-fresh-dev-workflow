@@ -41,6 +41,9 @@ SKIP_DIRS: frozenset[str] = frozenset(
         ".pytest_cache",
         ".ruff_cache",
         ".mypy_cache",
+        ".hypothesis",
+        "htmlcov",
+        "runtime",
         "node_modules",
     }
 )
