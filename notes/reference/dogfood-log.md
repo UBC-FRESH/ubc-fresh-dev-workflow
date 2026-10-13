@@ -17,7 +17,7 @@ This log records what the first dogfood runs found: the synthetic demo project, 
 - Output: `?? .coverage`.
 - Cause: `templates/project/.gitignore` lacks the coverage and runtime entries that the root's `.gitignore` gained in P0.7 and P0.10. The seed template was not updated along with the root.
 - Confirmed in: P1.2. A fresh clone of `main` finishes with a clean status, because the root's entries are present.
-- Disposition: **open**. The fix lands in this phase, in its own commit, with a regression test. This entry becomes **fixed** when that commit lands.
+- Disposition: **fixed** in this phase. The fix is a separate commit, with a regression test, `test_generated_project_ignores_the_files_its_gates_write`. That test failed on the unfixed seed and passes on the fix. The changelog's P1.3 entry for the fix describes it.
 
 ### F2. The validator checks the form of the parent number, not that the issue exists
 
@@ -77,5 +77,4 @@ This log records what the first dogfood runs found: the synthetic demo project, 
 
 ## Open items
 
-- Fix F1 in its own commit, next.
 - File the issues for F3, F4, and F7, and record their numbers in those entries.
