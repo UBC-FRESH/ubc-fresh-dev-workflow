@@ -1,0 +1,40 @@
+# UBC-FRESH Dev Workflow
+
+> Agent-facing index for the UBC-FRESH dev workflow seed. Read the linked pages before you change a project. They are the source of truth for the workflow contract.
+
+## Start here
+
+- [Session protocol](agents/session-protocol.html): the steps to follow at the start of every session.
+- [Workflow model](reference/workflow-model.html): phases, tasks, subtasks, IDs, and status values.
+- [Approval gates](reference/approval-gates.html): what an agent may do without asking, and what waits for approval.
+- [Phase close-out](reference/phase-closeout.html): how a phase ends, with its report, its approval, and its execution.
+
+## Reference
+
+- [GitHub mapping](reference/github-mapping.html): parent and child issues, branches, pull requests, and closure.
+- [Issue standard](reference/issue-standard.html): required sections and formatting rules for issue bodies.
+- [Git conventions](reference/git-conventions.html): branch names, commit messages, and pull request titles.
+- [Quality gates](reference/quality-gates.html): the gates that form the green dashboard, and the CI jobs.
+- [Testing policy](reference/testing-policy.html): the layers of tests, and the coverage gate.
+- [Typing and docstrings](reference/typing-and-docstrings.html): the annotation and docstring rules.
+
+## Agents
+
+- [Bounded moves](agents/bounded-moves.html): what counts as one unit of work, and the scope-breach rule.
+- [Oracles and evidence](agents/oracles-and-evidence.html): evidence standards and the validator's finding codes.
+- [RTFM protocol](agents/rtfm.html): how to read, cite, and fix the docs.
+- [Green dashboard](agents/green-dashboard.html): the rule for any change from full green.
+- [Embedded capabilities](agents/embedded-capabilities.html): the contract for validated, advisory capabilities, with a conformance checklist.
+
+## API
+
+- [API reference](api/index.html): every public function, with its parameters, types, and return values.
+- [check_workflow](api/check-workflow.html): the validator, and the finding codes it reports.
+- [dashboard](api/dashboard.html): the green dashboard, its gates, and its exit status.
+- [new_project](api/new-project.html): the initializer that renders the seed.
+
+## Guides
+
+- [Onboarding](guides/onboarding.html): a guided tour for new people.
+- [Starting a new project](guides/first-project.html): from the seed to a reviewed first pull request.
+- [FRESH-style dev server](guides/dev-server/index.html): the reference environment and its security notes.
