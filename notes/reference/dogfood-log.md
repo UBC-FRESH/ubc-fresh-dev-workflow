@@ -95,6 +95,14 @@ This log records what the first dogfood runs found: the synthetic demo project, 
 - Cause: the demo was generated before `928223e`, which fixed the seed's ignore file, and before P1.5, which raised the gate to 95 percent. A generated project keeps the files it was generated with, and the seed does not update them.
 - Disposition: **accepted**. Each project owns its generated files. A rule for updating them after generation is the migration question in P5.3. The demo's commits name their paths, so `.coverage` stays out of them.
 
+### F11. Git refuses to delete a squash-merged branch unless it tracks its remote
+
+- Found in: P1.6, when the approved execution deleted the demo's branch. The deletion worked, because the branch tracked its remote. A scratch repository then showed that the same command fails without that tracking.
+- Command: `git branch -d feat2`, run after a squash merge in a scratch repository under `/tmp/opencode`, where the branch had no upstream. Exit status: non-zero.
+- Output: `error: the branch 'feat2' is not fully merged. If you are sure you want to delete it, run 'git branch -D feat2'`.
+- Cause: a squash commit does not make the branch an ancestor of `main`, so git cannot see the branch as merged. Git also accepts `-d` when the branch's upstream holds the same commits, which is why the demo's deletion succeeded.
+- Disposition: **fixed** in the P1.6 closeout commit. The execute step in `docs/reference/phase-closeout.rst` now says to confirm that the squash commit's tree equals the approved head, and to stop and report if git refuses the deletion, without force-deleting the branch.
+
 ## Validator gaps
 
 | Gap | Source | Disposition |
@@ -105,4 +113,4 @@ This log records what the first dogfood runs found: the synthetic demo project, 
 
 ## Open items
 
-None. Every entry has a disposition. F1 is fixed in `928223e`, and F8 in `14f9cd2`. F2, F5, F6, and F10 are accepted. F3, F4, F7, and F9 are deferred to #24, #25, #26, and #27.
+None. Every entry has a disposition. F1 is fixed in `928223e`, F8 in `14f9cd2`, and F11 in the P1.6 closeout commit. F2, F5, F6, and F10 are accepted. F3, F4, F7, and F9 are deferred to #24, #25, #26, and #27.
