@@ -33,3 +33,4 @@ Thumbs.db
 coverage.xml
 htmlcov/
 runtime/
+.hypothesis/

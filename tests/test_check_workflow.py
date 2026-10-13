@@ -7,6 +7,8 @@ patterns that the validator checks for.
 
 from __future__ import annotations
 
+import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -554,3 +556,74 @@ def test_render_shows_the_location_only_when_a_line_is_known() -> None:
 def test_python_version_supports_the_documented_grammar() -> None:
     """The validator needs Python 3.11 or later, which the CI matrix covers."""
     assert sys.version_info >= (3, 11)
+
+
+GIT_REQUIRED = pytest.mark.skipif(shutil.which("git") is None, reason="git is not installed")
+
+
+def git(root: Path, *args: str) -> None:
+    """Run a git command in a directory, for the file-set tests.
+
+    Parameters
+    ----------
+    root : Path
+        Directory to run the command in.
+    *args : str
+        Arguments passed to git after ``-C``.
+    """
+    subprocess.run(["git", "-C", str(root), *args], check=True, capture_output=True)
+
+
+@GIT_REQUIRED
+def test_git_file_set_ignores_caches_that_git_ignores(tmp_path: Path) -> None:
+    """A file under an ignored directory is not scanned, even if it holds a personal path."""
+    root = make_repo(tmp_path)
+    git(root, "init", "-q")
+    write(root, ".gitignore", "cache/\n")
+    write(root, "cache/leak.txt", f"Clone into {HOME_PREFIX}runner/work\n")
+    assert "PATH-PERSONAL" not in error_codes(root)
+
+
+@GIT_REQUIRED
+def test_git_file_set_scans_untracked_files_that_are_not_ignored(tmp_path: Path) -> None:
+    """A new file that a commit would include is scanned before it is staged."""
+    root = make_repo(tmp_path)
+    git(root, "init", "-q")
+    write(root, "notes/new.md", f"Bad{FORM_FEED}\n")
+    paths = {d.path for d in cw.run(root) if d.code == "CONTROL-CHAR"}
+    assert "notes/new.md" in paths
+
+
+@GIT_REQUIRED
+def test_a_directory_inside_another_repository_is_walked(tmp_path: Path) -> None:
+    """A generated project inside another repository is walked, not listed by the outer git."""
+    outer = tmp_path / "outer"
+    outer.mkdir()
+    git(outer, "init", "-q")
+    inner = make_repo(outer / "tmp" / "inner")
+    write(inner, "notes/bad.md", f"Bad{FORM_FEED}\n")
+    assert "CONTROL-CHAR" in error_codes(inner)
+
+
+def test_missing_git_falls_back_to_walking(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Without git on the path, the scan walks the tree and still finds defects."""
+    root = make_repo(tmp_path)
+    write(root, "notes/bad.md", f"Bad{FORM_FEED}\n")
+    monkeypatch.setenv("PATH", "")
+    assert "CONTROL-CHAR" in error_codes(root)
+
+
+def test_failed_listing_falls_back_to_walking(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """If git fails to list files, the scan walks the tree instead of trusting an empty list."""
+    root = make_repo(tmp_path)
+    write(root, "notes/bad.md", f"Bad{FORM_FEED}\n")
+
+    def fake_run(args: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+        if "rev-parse" in args:
+            return subprocess.CompletedProcess(args, 0, stdout=f"{root}\n", stderr="")
+        return subprocess.CompletedProcess(args, 1, stdout="", stderr="fatal\n")
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+    assert "CONTROL-CHAR" in error_codes(root)

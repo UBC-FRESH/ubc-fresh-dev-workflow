@@ -86,9 +86,10 @@ jobs:
         shell: bash
         run: |
           set +e
-          python scripts/dashboard.py --markdown --json runtime/dashboard.json > dashboard.md
+          mkdir -p runtime
+          python scripts/dashboard.py --markdown --json runtime/dashboard.json > runtime/dashboard.md
           status=$?
-          cat dashboard.md >> "$GITHUB_STEP_SUMMARY"
+          cat runtime/dashboard.md >> "$GITHUB_STEP_SUMMARY"
           exit $status
 
       - name: Upload the dashboard record

@@ -22,6 +22,7 @@ import argparse
 import datetime as dt
 import os
 import re
+import subprocess
 import sys
 from collections.abc import Iterator
 from dataclasses import dataclass, field
@@ -253,34 +254,103 @@ def warning(code: str, path: str, line: int, message: str) -> Diagnostic:
     return Diagnostic("warning", code, path, line, message)
 
 
-def iter_text_files(root: Path) -> Iterator[Path]:
-    """Yield the UTF-8 text files under a repository root that the scans should read.
+def _git_file_set(root: Path) -> list[Path] | None:
+    """List the files that git would commit under a repository root.
 
-    Ignored directories, the ``tests`` tree, the validator itself, oversized files, and
-    symbolic links are skipped, as are files that are not valid UTF-8.
+    The list is tracked files plus untracked files that git does not ignore, which is the set a
+    commit would include. It is used only when the root is the top level of a git working tree. A
+    directory inside another repository, such as a generated project, is walked instead.
 
     Parameters
     ----------
     root : Path
-        Repository root to walk.
+        Directory to inspect.
+
+    Returns
+    -------
+    list of Path or None
+        Absolute paths of the candidate files. ``None`` when git is not installed, or when the root
+        is not the top level of a repository, in which case the caller walks the tree.
+    """
+    try:
+        top = subprocess.run(
+            ["git", "-C", str(root), "rev-parse", "--show-toplevel"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if top.returncode != 0 or Path(top.stdout.strip()).resolve() != root.resolve():
+            return None
+        listing = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(root),
+                "ls-files",
+                "--cached",
+                "--others",
+                "--exclude-standard",
+                "-z",
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError:
+        return None
+    if listing.returncode != 0:
+        return None
+    return [root / name for name in listing.stdout.split("\0") if name]
+
+
+def _walk_files(root: Path) -> Iterator[Path]:
+    """Yield every file under a root, skipping the directories in ``SKIP_DIRS``.
+
+    Parameters
+    ----------
+    root : Path
+        Directory to walk.
+
+    Yields
+    ------
+    Path
+        Absolute path of each file, in sorted order within each directory.
+    """
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = sorted(name for name in dirnames if name not in SKIP_DIRS)
+        for name in sorted(filenames):
+            yield Path(dirpath) / name
+
+
+def iter_text_files(root: Path) -> Iterator[Path]:
+    """Yield the UTF-8 text files that the scans should read.
+
+    The candidates are the files that git would commit, when the root is a repository top level,
+    and every file under the root otherwise. The ``tests`` tree, the validator itself, symbolic
+    links, oversized files, and files that are not valid UTF-8 are skipped in both cases.
+
+    Parameters
+    ----------
+    root : Path
+        Repository root or directory to scan.
 
     Yields
     ------
     Path
         Absolute path of each file that passes the filters, in sorted order.
     """
-    for dirpath, dirnames, filenames in os.walk(root):
-        dirnames[:] = sorted(name for name in dirnames if name not in SKIP_DIRS)
-        for name in sorted(filenames):
-            path = Path(dirpath) / name
-            rel = path.relative_to(root)
-            if rel.parts[0] in SKIP_TOP_LEVEL or rel.as_posix() == SELF_RELPATH:
-                continue
-            if path.is_symlink() or not path.is_file():
-                continue
-            if path.stat().st_size > MAX_SCAN_BYTES or not _is_utf8(path):
-                continue
-            yield path
+    candidates = _git_file_set(root)
+    if candidates is None:
+        candidates = list(_walk_files(root))
+    for path in sorted(candidates):
+        rel = path.relative_to(root)
+        if rel.parts[0] in SKIP_TOP_LEVEL or rel.as_posix() == SELF_RELPATH:
+            continue
+        if path.is_symlink() or not path.is_file():
+            continue
+        if path.stat().st_size > MAX_SCAN_BYTES or not _is_utf8(path):
+            continue
+        yield path
 
 
 def _is_utf8(path: Path) -> bool:
