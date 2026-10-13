@@ -33,7 +33,8 @@ This log records what the first dogfood runs found: the synthetic demo project, 
 - Command: the same validator command as F2. Exit status: 0.
 - Output: `0 error(s), 3 warning(s)`, with the placeholder sentence still in `README.md`, `AGENTS.md`, and `docs/index.rst`.
 - Cause: the validator has no check for the seed's placeholder text, so a placeholder can pass every gate.
-- Disposition: **deferred**. A placeholder check is a validator change, so it needs a changelog entry and tests when it lands. The issue is filed next, and its number goes into this entry.
+- Disposition: **deferred**. A placeholder check is a validator change, so it needs a changelog entry and tests when it lands.
+- Issue: #24, filed in P1.3.
 
 ### F4. The seed's Phase 0 cannot be finished locally
 
@@ -41,7 +42,8 @@ This log records what the first dogfood runs found: the synthetic demo project, 
 - Command: a read of `tmp/synthetic-demo/ROADMAP.md`, line 43. Exit status: not applicable, because it was a file read.
 - Output: `- [ ] P0.1 Create the GitHub repository and push the rendered seed`.
 - Cause: the seed's Phase 0 mixes local steps with a GitHub step. A local rehearsal cannot tick P0.1. The rehearsal used a local bare remote in its place, and the demo's changelog records that substitution.
-- Disposition: **deferred**. Separating the local steps from the GitHub steps changes the seed's contract, so it needs an ADR before any change. The issue is filed next, and its number goes into this entry.
+- Disposition: **deferred**. Separating the local steps from the GitHub steps changes the seed's contract, so it needs an ADR before any change.
+- Issue: #25, filed in P1.3.
 
 ### F5. The demo's dashboard runs six gates, not eight
 
@@ -65,16 +67,17 @@ This log records what the first dogfood runs found: the synthetic demo project, 
 - Command: `tmp/fresh-clone/.venv/bin/python -m pip install -r tmp/fresh-clone/requirements-dev.txt`. Exit status: 0.
 - Output: the newest releases on the day, listed under Provenance.
 - Cause: `requirements-dev.txt` sets floors, such as `ruff>=0.6`, so a fresh install takes the newest release available. The working tree and the clone happen to match today.
-- Disposition: **deferred**. Choosing a constraints file or exact pins changes how the project is reproduced, so it needs an ADR before any change. The issue is filed next, and its number goes into this entry.
+- Disposition: **deferred**. Choosing a constraints file or exact pins changes how the project is reproduced, so it needs an ADR before any change.
+- Issue: #26, filed in P1.3.
 
 ## Validator gaps
 
 | Gap | Source | Disposition |
 | --- | --- | --- |
 | V1. The existence of the parent issue is not checked. | F2 | accepted |
-| V2. The seed's placeholder text is not flagged. | F3 | deferred, issue filed next |
+| V2. The seed's placeholder text is not flagged. | F3 | deferred, #24 |
 | V3. Walk mode does not read the root `.gitignore`. An ignored binary file is skipped only because it is not UTF-8. | Known risk from the P0 close-out | deferred to P1.4, #21 |
 
 ## Open items
 
-- File the issues for F3, F4, and F7, and record their numbers in those entries.
+None. Every entry has a disposition. F1 is fixed in `928223e`. F2, F5, and F6 are accepted. F3, F4, and F7 are deferred to #24, #25, and #26.
