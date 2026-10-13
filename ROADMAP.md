@@ -184,7 +184,7 @@ Goal: keep the seed current: triage incoming ideas, review it on a cadence, and 
 ## Detailed Next Steps Notes
 
 1. Phase 0 is complete. Pull request #17 merged as `2943d83`, GitHub Pages is live, branch protection requires the four CI checks on `main`, and #1 is closed.
-2. Phase 1 is active. Its child tasks are #18 to #23, under the parent #9. P1.1 to P1.5 are complete. Their records are on #18 to #22. The findings deferred from the dogfood log are on #24, #25, and #26. P1.6, the close-out rehearsal on the demo project (#23), is next.
+2. Phase 1 is active. Its child tasks are #18 to #23, under the parent #9. P1.1 to P1.5 are complete. Their records are on #18 to #22. The findings deferred from the dogfood log are on #24, #25, #26, and #27. P1.6, the close-out rehearsal on the demo project (#23), has queued the demo's Phase 0 close-out, and the approval is the next step.
 3. Phase 1 closes with its own close-out report, `notes/reports/p1-closeout.md`, queued in a pull request. The maintainer approves the report. Then the agent squash-merges the pull request, closes #9, and deletes the branch.
 4. Recommended defaults, as approved with the Phase 0 close-out. The Phase 1 report can change them:
    - Seed issue forms (YAML) stay deferred. The default is Markdown templates, until the friction log shows the need.

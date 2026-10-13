@@ -1,12 +1,12 @@
 # Dogfood log, Phase 1
 
-This log records what the first dogfood runs found: the synthetic demo project, its local rehearsal of the loop, and the fresh clone of this repository. Each entry gives the command, its exit status, the cause, and a disposition. A disposition is one of three: **fixed**, with its commit; **deferred**, with its issue; or **accepted**, with its reason. The step-by-step records of the runs are on #18 (P1.1) and #19 (P1.2).
+This log records what the first dogfood runs found: the synthetic demo project, its local rehearsal of the loop, and the fresh clone of this repository. Each entry gives the command, its exit status, the cause, and a disposition. A disposition is one of three: **fixed**, with its commit; **deferred**, with its issue; or **accepted**, with its reason. The step-by-step records of the runs are on #18 (P1.1), #19 (P1.2), and #23 (P1.6).
 
 ## Provenance
 
 - Dates: 2026-10-13.
 - Environment: Linux, Python 3.12.3, git 2.43.0. The dev tools in the fresh clone resolved to ruff 0.17.0, mypy 2.4.0, pytest 9.1.1, pytest-cov 7.1.0, coverage 7.16.2, hypothesis 6.169.0, numpydoc 1.11.0, Sphinx 9.1.0, pre-commit 4.7.0, and sphinx-rtd-theme 3.1.0.
-- Sources: the demo at `tmp/synthetic-demo`, its local rehearsal remote at `tmp/synthetic-demo-origin.git`, and the fresh clone at `tmp/fresh-clone`. All three are untracked.
+- Sources: the demo at `tmp/synthetic-demo`, its P1.1 rehearsal remote at `tmp/synthetic-demo-origin.git`, its P1.6 stand-in remote at `tmp/p1-6-standin.git`, and the fresh clone at `tmp/fresh-clone`. All four are untracked.
 
 ## Entries
 
@@ -76,7 +76,24 @@ This log records what the first dogfood runs found: the synthetic demo project, 
 - Command: `.venv/bin/pre-commit run --all-files`, run from a shell without `.venv/bin` on `PATH`. Exit status: non-zero.
 - Output: `ModuleNotFoundError: No module named 'numpydoc'` while collecting `tests/test_api_docstrings.py`, and `No module named 'hypothesis'` in `tests/test_properties.py`. The traceback names the system Python.
 - Cause: the hooks use `language: system` and call `python` from `PATH`. A shell without the venv active resolves the system Python, which lacks the dev tools. The setup steps activate the venv, but they do not say that a commit must run from the activated shell.
-- Disposition: **fixed** in the P1.6 commit that adds the note to the setup steps, in `CONTRIBUTING.md` and its seed template. The hook design is unchanged.
+- Disposition: **fixed** in `14f9cd2`, which adds the note to the setup steps in `CONTRIBUTING.md` and its seed template. The hook design is unchanged.
+
+### F9. The seed's roadmap has no acceptance criteria for its phases
+
+- Found in: P1.6, while the demo's close-out report was written from the seed template.
+- Command: a read of `templates/project/ROADMAP.md.tmpl`, and of the close-out template that the demo received, `notes/reports/phase-closeout-template.md`. Exit status: not applicable, because these were file reads.
+- Output: each phase in the roadmap template has a goal and a task list, and no acceptance criteria. The close-out contract in `docs/reference/phase-closeout.rst` asks each report for each acceptance criterion from the roadmap.
+- Cause: this repository's roadmap gives each phase an `Acceptance criteria:` block, but the seed's roadmap template does not, so a project's close-out has no criteria to cite.
+- Disposition: **deferred**. The wording of the block is a maintainer decision, and the template change needs tests.
+- Issue: #27, filed in P1.6.
+
+### F10. Generated projects keep the files they were generated with
+
+- Found in: P1.6, in the demo's working tree and its coverage settings.
+- Command: `git -C tmp/synthetic-demo status --short`, and `grep -n "cov-fail-under" tmp/synthetic-demo/pyproject.toml`. Exit status: 0 for both.
+- Output: `?? .coverage`, and an `addopts` line that ends in `--cov-fail-under=90`.
+- Cause: the demo was generated before `928223e`, which fixed the seed's ignore file, and before P1.5, which raised the gate to 95 percent. A generated project keeps the files it was generated with, and the seed does not update them.
+- Disposition: **accepted**. Each project owns its generated files. A rule for updating them after generation is the migration question in P5.3. The demo's commits name their paths, so `.coverage` stays out of them.
 
 ## Validator gaps
 
@@ -88,4 +105,4 @@ This log records what the first dogfood runs found: the synthetic demo project, 
 
 ## Open items
 
-None. Every entry has a disposition. F1 is fixed in `928223e`. F2, F5, and F6 are accepted. F3, F4, and F7 are deferred to #24, #25, and #26.
+None. Every entry has a disposition. F1 is fixed in `928223e`, and F8 in `14f9cd2`. F2, F5, F6, and F10 are accepted. F3, F4, F7, and F9 are deferred to #24, #25, #26, and #27.
