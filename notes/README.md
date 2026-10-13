@@ -30,3 +30,4 @@ Notes are the persistent, agent-friendly context for this project. They hold wha
 - [ADR 0008: phase close-out, with approval before execution](adr/0008-phase-closeout-and-execution.md)
 - [Pattern survey](reference/pattern-survey.md): a sanitized survey of public UBC-FRESH repositories
 - [P0 close-out report](reports/p0-closeout.md): the evidence and the approval request for Phase 0
+- [Dogfood log, Phase 1](reference/dogfood-log.md): the friction found by the first dogfood runs, with a disposition for each entry
