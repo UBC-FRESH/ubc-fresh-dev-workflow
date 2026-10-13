@@ -6,10 +6,11 @@ import subprocess
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT: Path = Path(__file__).resolve().parents[1]
 
 
-def test_repository_passes_the_workflow_validator():
+def test_repository_passes_the_workflow_validator() -> None:
+    """The validator finds no errors in this repository."""
     result = subprocess.run(
         [sys.executable, str(ROOT / "scripts" / "check_workflow.py"), str(ROOT)],
         capture_output=True,

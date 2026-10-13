@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
 """Check a repository against the UBC-FRESH dev workflow surfaces.
 
-This script is the oracle for the planning surfaces. It parses ``ROADMAP.md``
-and ``CHANGE_LOG.md``, resolves local Markdown links and the ``docs/llms.txt``
-index, and scans tracked text for defects that must not reach a public
-repository: control characters, byte-order marks, personal paths, and
-secret-shaped strings. It uses only the standard library, so it runs in a fresh
-clone before anything is installed.
+This module is the oracle for the planning surfaces. It parses ``ROADMAP.md`` and
+``CHANGE_LOG.md``, resolves local Markdown links and the ``docs/llms.txt`` index, and
+scans tracked text for defects that must not reach a public repository: control
+characters, byte-order marks, personal paths, and secret-shaped strings. It uses only
+the standard library, so it runs in a fresh clone before anything is installed.
 
-Usage::
+Command-line usage::
 
     python scripts/check_workflow.py [ROOT]
     python scripts/check_workflow.py --files PATH [PATH ...]
 
-The exit status is 0 when no errors are found. Warnings are printed but do not
-fail the run. Finding codes are stable; see docs/agents/oracles-and-evidence.rst.
+The exit status is 0 when no errors are found. Warnings are printed, but they do not
+fail the run. Finding codes are stable; see ``docs/agents/oracles-and-evidence.rst``.
 """
 
 from __future__ import annotations
@@ -28,9 +27,9 @@ from collections.abc import Iterator
 from dataclasses import dataclass, field
 from pathlib import Path
 
-DEFAULT_ROOT = Path(__file__).resolve().parent.parent
-SELF_RELPATH = "scripts/check_workflow.py"
-SKIP_DIRS = frozenset(
+DEFAULT_ROOT: Path = Path(__file__).resolve().parent.parent
+SELF_RELPATH: str = "scripts/check_workflow.py"
+SKIP_DIRS: frozenset[str] = frozenset(
     {
         ".git",
         ".venv",
@@ -44,12 +43,12 @@ SKIP_DIRS = frozenset(
         "node_modules",
     }
 )
-SKIP_TOP_LEVEL = frozenset({"tests"})
-MAX_SCAN_BYTES = 1_000_000
-PHASE_STATUSES = ("planned", "active", "pr-open", "complete", "deferred")
-OPEN_STATUSES = ("active", "pr-open", "complete")
+SKIP_TOP_LEVEL: frozenset[str] = frozenset({"tests"})
+MAX_SCAN_BYTES: int = 1_000_000
+PHASE_STATUSES: tuple[str, ...] = ("planned", "active", "pr-open", "complete", "deferred")
+OPEN_STATUSES: tuple[str, ...] = ("active", "pr-open", "complete")
 
-REQUIRED_FILES = (
+REQUIRED_FILES: tuple[str, ...] = (
     "README.md",
     "AGENTS.md",
     "ROADMAP.md",
@@ -68,24 +67,29 @@ REQUIRED_FILES = (
     ".github/workflows/docs.yml",
     "tests/test_workflow.py",
 )
-RECOMMENDED_FILES = ("LICENSE", "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "CITATION.cff")
+RECOMMENDED_FILES: tuple[str, ...] = (
+    "LICENSE",
+    "CONTRIBUTING.md",
+    "CODE_OF_CONDUCT.md",
+    "CITATION.cff",
+)
 
-PHASE_RE = re.compile(r"^## Phase (\d+):\s*(.+?)\s*$")
-PARENT_RE = re.compile(r"^Parent issue:\s*(#\d+|TBD)\s*$")
-BRANCH_RE = re.compile(r"^Branch:\s*`([^`\s]+)`\s*$")
-STATUS_RE = re.compile(r"^Status:\s*([a-z-]+)\s*$")
-TASK_RE = re.compile(r"^- \[( |x|X)\] P(\d+)\.(\d+)\s+(.+?)\s*$")
-SUBTASK_RE = re.compile(r"^\s{2,}- \[( |x|X)\]\s+\S")
-ISSUE_REF_RE = re.compile(r"\(#(\d+)\)\s*$")
-TRACKER_RE = re.compile(r"^\|\s*P(\d+)\b")
-LINK_RE = re.compile(r"\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
-CONTROL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
-PERSONAL_PATTERNS = (
+PHASE_RE: re.Pattern[str] = re.compile(r"^## Phase (\d+):\s*(.+?)\s*$")
+PARENT_RE: re.Pattern[str] = re.compile(r"^Parent issue:\s*(#\d+|TBD)\s*$")
+BRANCH_RE: re.Pattern[str] = re.compile(r"^Branch:\s*`([^`\s]+)`\s*$")
+STATUS_RE: re.Pattern[str] = re.compile(r"^Status:\s*([a-z-]+)\s*$")
+TASK_RE: re.Pattern[str] = re.compile(r"^- \[( |x|X)\] P(\d+)\.(\d+)\s+(.+?)\s*$")
+SUBTASK_RE: re.Pattern[str] = re.compile(r"^\s{2,}- \[( |x|X)\]\s+\S")
+ISSUE_REF_RE: re.Pattern[str] = re.compile(r"\(#(\d+)\)\s*$")
+TRACKER_RE: re.Pattern[str] = re.compile(r"^\|\s*P(\d+)\b")
+LINK_RE: re.Pattern[str] = re.compile(r"\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
+CONTROL_RE: re.Pattern[str] = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
+PERSONAL_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
     (re.compile(r"/home/(?![<${])[A-Za-z0-9._-]+/"), "Linux home directory path"),
     (re.compile(r"/Users/(?![<${])[A-Za-z0-9._-]+/"), "macOS home directory path"),
     (re.compile(r"[A-Za-z]:\\Users\\(?![<${])"), "Windows user profile path"),
 )
-SECRET_PATTERNS = (
+SECRET_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
     (re.compile(r"\bgh[pousr]_[A-Za-z0-9]{30,}\b"), "GitHub token"),
     (re.compile(r"\bgithub_pat_[A-Za-z0-9_]{30,}"), "GitHub fine-grained token"),
     (re.compile(r"\bpypi-[A-Za-z0-9_-]{40,}"), "PyPI token"),
@@ -103,7 +107,21 @@ SECRET_PATTERNS = (
 
 @dataclass(frozen=True)
 class Diagnostic:
-    """One finding: its severity, stable code, location, and message."""
+    """One finding: its severity, its stable code, its location, and its message.
+
+    Attributes
+    ----------
+    severity : str
+        Either ``"error"`` or ``"warning"``.
+    code : str
+        Stable finding code, such as ``ROADMAP-STATUS``.
+    path : str
+        Repository-relative path of the file that the finding concerns.
+    line : int
+        One-based line number, or ``0`` for a whole-file finding.
+    message : str
+        Explanation of what to change.
+    """
 
     severity: str
     code: str
@@ -112,24 +130,36 @@ class Diagnostic:
     message: str
 
     def render(self) -> str:
-        """Return the finding as one line of text."""
+        """Render the finding as one line of text.
+
+        Returns
+        -------
+        str
+            The severity, code, location, and message, padded into columns.
+        """
         where = f"{self.path}:{self.line}" if self.line else self.path
         return f"{self.severity:<8}{self.code:<22}{where}  {self.message}"
 
 
-def error(code: str, path: str, line: int, message: str) -> Diagnostic:
-    """Build an error finding."""
-    return Diagnostic("error", code, path, line, message)
-
-
-def warning(code: str, path: str, line: int, message: str) -> Diagnostic:
-    """Build a warning finding."""
-    return Diagnostic("warning", code, path, line, message)
-
-
 @dataclass
 class Task:
-    """A task line in a phase section, with its subtask lines."""
+    """A task line in a phase section, together with its subtask lines.
+
+    Attributes
+    ----------
+    phase : int
+        The phase number that the task ID claims.
+    number : int
+        The task number within its phase.
+    checked : bool
+        Whether the task checkbox is ticked.
+    line : int
+        One-based line number of the task line.
+    issue : int or None
+        The child issue number, when the task line names one.
+    subtasks : list of tuple of (int, bool)
+        One ``(line number, checked)`` pair for each subtask line under the task.
+    """
 
     phase: int
     number: int
@@ -141,7 +171,23 @@ class Task:
 
 @dataclass
 class Phase:
-    """A '## Phase <n>:' section, its header lines, and its tasks."""
+    """A ``## Phase <n>:`` section, its header lines, and its tasks.
+
+    Attributes
+    ----------
+    number : int
+        The phase number from the heading.
+    line : int
+        One-based line number of the heading.
+    parent : str or None
+        The ``Parent issue:`` value, such as ``#1`` or ``TBD``.
+    branch : str or None
+        The ``Branch:`` value, without backticks.
+    status : str or None
+        The ``Status:`` value.
+    tasks : list of Task
+        The tasks listed in the section, in file order.
+    """
 
     number: int
     line: int
@@ -151,8 +197,66 @@ class Phase:
     tasks: list[Task] = field(default_factory=list)
 
 
+def error(code: str, path: str, line: int, message: str) -> Diagnostic:
+    """Build an error-severity finding.
+
+    Parameters
+    ----------
+    code : str
+        Stable finding code, such as ``LINK-BROKEN``.
+    path : str
+        Repository-relative path that the finding concerns.
+    line : int
+        One-based line number, or ``0`` for a whole-file finding.
+    message : str
+        Explanation of what to change.
+
+    Returns
+    -------
+    Diagnostic
+        A finding with severity ``"error"``.
+    """
+    return Diagnostic("error", code, path, line, message)
+
+
+def warning(code: str, path: str, line: int, message: str) -> Diagnostic:
+    """Build a warning-severity finding.
+
+    Parameters
+    ----------
+    code : str
+        Stable finding code, such as ``FILE-RECOMMENDED``.
+    path : str
+        Repository-relative path that the finding concerns.
+    line : int
+        One-based line number, or ``0`` for a whole-file finding.
+    message : str
+        Explanation of what to change.
+
+    Returns
+    -------
+    Diagnostic
+        A finding with severity ``"warning"``.
+    """
+    return Diagnostic("warning", code, path, line, message)
+
+
 def iter_text_files(root: Path) -> Iterator[Path]:
-    """Yield tracked-looking UTF-8 text files under root, skipping ignored paths."""
+    """Yield the UTF-8 text files under a repository root that the scans should read.
+
+    Ignored directories, the ``tests`` tree, the validator itself, oversized files, and
+    symbolic links are skipped, as are files that are not valid UTF-8.
+
+    Parameters
+    ----------
+    root : Path
+        Repository root to walk.
+
+    Yields
+    ------
+    Path
+        Absolute path of each file that passes the filters, in sorted order.
+    """
     for dirpath, dirnames, filenames in os.walk(root):
         dirnames[:] = sorted(name for name in dirnames if name not in SKIP_DIRS)
         for name in sorted(filenames):
@@ -168,6 +272,18 @@ def iter_text_files(root: Path) -> Iterator[Path]:
 
 
 def _is_utf8(path: Path) -> bool:
+    """Report whether a file decodes as UTF-8.
+
+    Parameters
+    ----------
+    path : Path
+        File to test.
+
+    Returns
+    -------
+    bool
+        ``True`` when the file decodes as UTF-8.
+    """
     try:
         path.read_bytes().decode("utf-8")
     except UnicodeDecodeError:
@@ -176,30 +292,104 @@ def _is_utf8(path: Path) -> bool:
 
 
 def _read_text(path: Path) -> str:
+    """Read a file as text, replacing undecodable bytes.
+
+    Parameters
+    ----------
+    path : Path
+        File to read.
+
+    Returns
+    -------
+    str
+        The decoded text.
+    """
     return path.read_bytes().decode("utf-8", errors="replace")
 
 
 def _read_lines(path: Path) -> list[str]:
+    """Read a file as a list of lines without their line endings.
+
+    Parameters
+    ----------
+    path : Path
+        File to read.
+
+    Returns
+    -------
+    list of str
+        The lines of the file, split on newline characters.
+    """
     return _read_text(path).split("\n")
 
 
 def _is_local_target(target: str) -> bool:
+    """Report whether a link target is a local path that should be resolved.
+
+    Parameters
+    ----------
+    target : str
+        The raw link target, as written inside the parentheses.
+
+    Returns
+    -------
+    bool
+        ``False`` for web, mail, fragment-only, and placeholder targets.
+    """
     if target.startswith(("http://", "https://", "mailto:", "#", "<")):
         return False
     return "{{" not in target and "<" not in target
 
 
 def _strip_fragment(target: str) -> str:
+    """Remove a ``#fragment`` suffix from a link target.
+
+    Parameters
+    ----------
+    target : str
+        The link target.
+
+    Returns
+    -------
+    str
+        The part of the target before the first ``#``.
+    """
     return target.split("#", 1)[0]
 
 
 def _issue_ref(text: str) -> int | None:
+    """Extract a trailing ``(#n)`` issue reference from a task description.
+
+    Parameters
+    ----------
+    text : str
+        The task description.
+
+    Returns
+    -------
+    int or None
+        The issue number, or ``None`` when the description has no trailing reference.
+    """
     match = ISSUE_REF_RE.search(text)
     return int(match.group(1)) if match else None
 
 
 def parse_roadmap(lines: list[str]) -> list[Phase]:
-    """Parse the phase sections of a roadmap into Phase records."""
+    """Parse the phase sections of a roadmap into structured records.
+
+    Phase headers, status lines, tasks, and subtasks are recognized by the grammar in
+    ``docs/reference/workflow-model.rst``. Lines outside a phase section are ignored.
+
+    Parameters
+    ----------
+    lines : list of str
+        The roadmap, one entry per line, without line endings.
+
+    Returns
+    -------
+    list of Phase
+        One record for each ``## Phase <n>:`` heading, in file order.
+    """
     phases: list[Phase] = []
     current: Phase | None = None
     task: Task | None = None
@@ -241,7 +431,19 @@ def parse_roadmap(lines: list[str]) -> list[Phase]:
 
 
 def parse_tracker(lines: list[str]) -> list[tuple[int, list[str], int]]:
-    """Return (phase number, table cells, line number) for each tracker row."""
+    """Find the rows of the Issue Tracker Map table.
+
+    Parameters
+    ----------
+    lines : list of str
+        The roadmap, one entry per line.
+
+    Returns
+    -------
+    list of tuple of (int, list of str, int)
+        For each row that starts with a phase ID: the phase number, the stripped table
+        cells, and the one-based line number.
+    """
     rows: list[tuple[int, list[str], int]] = []
     for lineno, raw in enumerate(lines, start=1):
         line = raw.strip()
@@ -254,6 +456,20 @@ def parse_tracker(lines: list[str]) -> list[tuple[int, list[str], int]]:
 
 
 def _check_phase(path: str, phase: Phase) -> list[Diagnostic]:
+    """Check one phase section for missing metadata, status, and task consistency.
+
+    Parameters
+    ----------
+    path : str
+        Name of the roadmap file, used in the findings.
+    phase : Phase
+        The phase record to check.
+
+    Returns
+    -------
+    list of Diagnostic
+        Findings for this phase. The list is empty when the phase is consistent.
+    """
     diags: list[Diagnostic] = []
     label = f"P{phase.number}"
     where = phase.line
@@ -263,64 +479,52 @@ def _check_phase(path: str, phase: Phase) -> list[Diagnostic]:
             diags.append(error("ROADMAP-PHASE-META", path, where, f"{label} has no '{name}:' line"))
     if phase.status is not None and phase.status not in PHASE_STATUSES:
         allowed = ", ".join(PHASE_STATUSES)
-        diags.append(
-            error(
-                "ROADMAP-STATUS",
-                path,
-                where,
-                f"{label} status '{phase.status}' is not one of {allowed}",
-            )
-        )
+        message = f"{label} status '{phase.status}' is not one of {allowed}"
+        diags.append(error("ROADMAP-STATUS", path, where, message))
     if phase.parent == "TBD" and phase.status in OPEN_STATUSES:
-        diags.append(
-            error(
-                "ROADMAP-PARENT-REQUIRED",
-                path,
-                where,
-                f"{label} is {phase.status} but has no parent issue; create it first",
-            )
-        )
+        message = f"{label} is {phase.status} but has no parent issue; create it first"
+        diags.append(error("ROADMAP-PARENT-REQUIRED", path, where, message))
     seen: set[int] = set()
     for task in phase.tasks:
         task_label = f"P{task.phase}.{task.number}"
         if task.phase != phase.number:
-            diags.append(
-                error("ROADMAP-TASK-ID", path, task.line, f"{task_label} sits under {label}")
-            )
+            message = f"{task_label} sits under {label}"
+            diags.append(error("ROADMAP-TASK-ID", path, task.line, message))
         if task.number in seen:
-            diags.append(
-                error("ROADMAP-TASK-ID", path, task.line, f"{task_label} repeats in {label}")
-            )
+            diags.append(error("ROADMAP-TASK-ID", path, task.line, f"{task_label} repeats"))
         seen.add(task.number)
         if phase.status != "complete":
             continue
         if not task.checked:
-            diags.append(
-                error(
-                    "ROADMAP-COMPLETE-OPEN",
-                    path,
-                    task.line,
-                    f"{label} is complete but {task_label} is not checked",
-                )
-            )
+            message = f"{label} is complete but {task_label} is not checked"
+            diags.append(error("ROADMAP-COMPLETE-OPEN", path, task.line, message))
         for sub_line, sub_checked in task.subtasks:
             if not sub_checked:
-                diags.append(
-                    error(
-                        "ROADMAP-COMPLETE-OPEN",
-                        path,
-                        sub_line,
-                        f"{label} is complete but a subtask of {task_label} is not checked",
-                    )
-                )
+                message = f"{label} is complete but a subtask of {task_label} is not checked"
+                diags.append(error("ROADMAP-COMPLETE-OPEN", path, sub_line, message))
     if phase.status == "complete" and not phase.tasks:
-        diags.append(
-            error("ROADMAP-COMPLETE-OPEN", path, where, f"{label} is complete but lists no tasks")
-        )
+        message = f"{label} is complete but lists no tasks"
+        diags.append(error("ROADMAP-COMPLETE-OPEN", path, where, message))
     return diags
 
 
 def _check_tracker(path: str, lines: list[str], phases: list[Phase]) -> list[Diagnostic]:
+    """Check the Issue Tracker Map against the phase sections.
+
+    Parameters
+    ----------
+    path : str
+        Name of the roadmap file, used in the findings.
+    lines : list of str
+        The roadmap, one entry per line.
+    phases : list of Phase
+        The phase records parsed from the same roadmap.
+
+    Returns
+    -------
+    list of Diagnostic
+        Findings for missing, duplicated, or inconsistent tracker rows.
+    """
     diags: list[Diagnostic] = []
     rows: dict[int, tuple[list[str], int]] = {}
     for number, cells, lineno in parse_tracker(lines):
@@ -340,48 +544,37 @@ def _check_tracker(path: str, lines: list[str], phases: list[Phase]) -> list[Dia
             continue
         cells, lineno = rows[phase.number]
         if len(cells) < 4:
-            diags.append(
-                error(
-                    "ROADMAP-TRACKER",
-                    path,
-                    lineno,
-                    f"{label} row needs Phase, Parent issue, Branch, and Status cells",
-                )
-            )
+            message = f"{label} row needs Phase, Parent issue, Branch, and Status cells"
+            diags.append(error("ROADMAP-TRACKER", path, lineno, message))
             continue
         parent_cell, branch_cell, status_cell = cells[1], cells[2], cells[3]
         if parent_cell != (phase.parent or ""):
-            diags.append(
-                error(
-                    "ROADMAP-TRACKER",
-                    path,
-                    lineno,
-                    f"{label} parent issue '{parent_cell}' differs from its phase section",
-                )
-            )
+            message = f"{label} parent issue '{parent_cell}' differs from its phase section"
+            diags.append(error("ROADMAP-TRACKER", path, lineno, message))
         if branch_cell.strip("`") != (phase.branch or ""):
-            diags.append(
-                error(
-                    "ROADMAP-TRACKER",
-                    path,
-                    lineno,
-                    f"{label} branch '{branch_cell}' differs from its phase section",
-                )
-            )
+            message = f"{label} branch '{branch_cell}' differs from its phase section"
+            diags.append(error("ROADMAP-TRACKER", path, lineno, message))
         if status_cell != (phase.status or ""):
-            diags.append(
-                error(
-                    "ROADMAP-TRACKER",
-                    path,
-                    lineno,
-                    f"{label} status '{status_cell}' differs from its phase section",
-                )
-            )
+            message = f"{label} status '{status_cell}' differs from its phase section"
+            diags.append(error("ROADMAP-TRACKER", path, lineno, message))
     return diags
 
 
 def check_roadmap(path: str, text: str) -> list[Diagnostic]:
-    """Check the phase grammar, phase statuses, and tracker map of a roadmap."""
+    """Check a roadmap's phase grammar, phase statuses, and tracker map.
+
+    Parameters
+    ----------
+    path : str
+        Name of the roadmap file, used in the findings.
+    text : str
+        The full roadmap text.
+
+    Returns
+    -------
+    list of Diagnostic
+        Every finding for the roadmap. The list is empty when the roadmap is consistent.
+    """
     lines = text.split("\n")
     phases = parse_roadmap(lines)
     if not phases:
@@ -390,14 +583,8 @@ def check_roadmap(path: str, text: str) -> list[Diagnostic]:
     previous = -1
     for phase in phases:
         if phase.number <= previous:
-            diags.append(
-                error(
-                    "ROADMAP-PHASE-ORDER",
-                    path,
-                    phase.line,
-                    f"P{phase.number} must be unique and come after P{previous}",
-                )
-            )
+            message = f"P{phase.number} must be unique and come after P{previous}"
+            diags.append(error("ROADMAP-PHASE-ORDER", path, phase.line, message))
         previous = max(previous, phase.number)
         diags.extend(_check_phase(path, phase))
     diags.extend(_check_tracker(path, lines, phases))
@@ -405,7 +592,20 @@ def check_roadmap(path: str, text: str) -> list[Diagnostic]:
 
 
 def check_changelog(path: str, text: str) -> list[Diagnostic]:
-    """Check that changelog entries are dated ISO dates in ascending order."""
+    """Check that changelog entries are ISO dates in non-decreasing order.
+
+    Parameters
+    ----------
+    path : str
+        Name of the changelog file, used in the findings.
+    text : str
+        The full changelog text.
+
+    Returns
+    -------
+    list of Diagnostic
+        Findings for malformed headings, out-of-order entries, and an empty changelog.
+    """
     diags: list[Diagnostic] = []
     previous: dt.date | None = None
     dated = 0
@@ -416,20 +616,13 @@ def check_changelog(path: str, text: str) -> list[Diagnostic]:
         try:
             day = dt.date.fromisoformat(label)
         except ValueError:
-            diags.append(
-                error("CHANGELOG-DATE", path, lineno, f"heading '{label}' is not a YYYY-MM-DD date")
-            )
+            message = f"heading '{label}' is not a YYYY-MM-DD date"
+            diags.append(error("CHANGELOG-DATE", path, lineno, message))
             continue
         dated += 1
         if previous is not None and day < previous:
-            diags.append(
-                error(
-                    "CHANGELOG-ORDER",
-                    path,
-                    lineno,
-                    f"{label} is older than the entry above it; newest entries go last",
-                )
-            )
+            message = f"{label} is older than the entry above it; newest entries go last"
+            diags.append(error("CHANGELOG-ORDER", path, lineno, message))
         previous = day
     if dated == 0:
         diags.append(error("CHANGELOG-EMPTY", path, 0, "no dated '## YYYY-MM-DD' entries"))
@@ -437,7 +630,19 @@ def check_changelog(path: str, text: str) -> list[Diagnostic]:
 
 
 def check_required_files(root: Path) -> list[Diagnostic]:
-    """Check that the required files exist, and warn about recommended ones."""
+    """Check that the required files exist, and warn about recommended ones.
+
+    Parameters
+    ----------
+    root : Path
+        Repository root to check.
+
+    Returns
+    -------
+    list of Diagnostic
+        ``FILE-MISSING`` errors for absent required files, and ``FILE-RECOMMENDED``
+        warnings for absent recommended files.
+    """
     diags: list[Diagnostic] = []
     for rel in REQUIRED_FILES:
         if not (root / rel).is_file():
@@ -449,7 +654,18 @@ def check_required_files(root: Path) -> list[Diagnostic]:
 
 
 def check_markdown_links(root: Path) -> list[Diagnostic]:
-    """Check that every local link in a Markdown file points at an existing file."""
+    """Check that every local link in a Markdown file points at an existing path.
+
+    Parameters
+    ----------
+    root : Path
+        Repository root to check.
+
+    Returns
+    -------
+    list of Diagnostic
+        ``LINK-BROKEN`` errors for each local link whose target does not exist.
+    """
     diags: list[Diagnostic] = []
     for path in iter_text_files(root):
         if path.suffix != ".md":
@@ -461,17 +677,29 @@ def check_markdown_links(root: Path) -> list[Diagnostic]:
                 if not _is_local_target(target):
                     continue
                 file_part = _strip_fragment(target)
-                if file_part and not (path.parent / file_part).exists():
-                    diags.append(
-                        error(
-                            "LINK-BROKEN", rel, lineno, f"link target '{file_part}' does not exist"
-                        )
-                    )
+                if not (path.parent / file_part).exists():
+                    message = f"link target '{file_part}' does not exist"
+                    diags.append(error("LINK-BROKEN", rel, lineno, message))
     return diags
 
 
 def check_llms(root: Path) -> list[Diagnostic]:
-    """Check that every link in docs/llms.txt names an existing docs page."""
+    """Check that every link in ``docs/llms.txt`` names an existing docs page.
+
+    A link that ends in ``.html`` maps to the ``.rst`` source with the same stem. Any
+    other link is resolved relative to ``docs/``.
+
+    Parameters
+    ----------
+    root : Path
+        Repository root to check.
+
+    Returns
+    -------
+    list of Diagnostic
+        ``LLMS-BROKEN`` errors for each link without a matching page. The list is empty
+        when the index is absent, because ``FILE-MISSING`` reports that case.
+    """
     index = root / "docs" / "llms.txt"
     if not index.is_file():
         return []
@@ -482,26 +710,31 @@ def check_llms(root: Path) -> list[Diagnostic]:
             if not _is_local_target(target):
                 continue
             file_part = _strip_fragment(target)
-            if not file_part:
-                continue
             if file_part.endswith(".html"):
                 source = root / "docs" / (file_part[: -len(".html")] + ".rst")
             else:
                 source = root / "docs" / file_part
             if not source.exists():
-                diags.append(
-                    error(
-                        "LLMS-BROKEN",
-                        "docs/llms.txt",
-                        lineno,
-                        f"'{file_part}' has no matching page under docs/",
-                    )
-                )
+                message = f"'{file_part}' has no matching page under docs/"
+                diags.append(error("LLMS-BROKEN", "docs/llms.txt", lineno, message))
     return diags
 
 
 def scan_text(rel: str, data: bytes) -> list[Diagnostic]:
-    """Scan one file for control characters, byte-order marks, and unsafe strings."""
+    """Scan one file for control characters, byte-order marks, and unsafe strings.
+
+    Parameters
+    ----------
+    rel : str
+        Repository-relative path, used in the findings.
+    data : bytes
+        The raw file contents, which must be valid UTF-8.
+
+    Returns
+    -------
+    list of Diagnostic
+        One finding for each defect found. A line can produce more than one finding.
+    """
     diags: list[Diagnostic] = []
     if b"\r" in data:
         diags.append(error("CONTROL-CHAR", rel, 0, "carriage return found; use LF line endings"))
@@ -512,36 +745,34 @@ def scan_text(rel: str, data: bytes) -> list[Diagnostic]:
         control = CONTROL_RE.search(line)
         if control is not None:
             code_point = ord(control.group())
-            diags.append(
-                error("CONTROL-CHAR", rel, lineno, f"control character U+{code_point:04X} found")
-            )
+            message = f"control character U+{code_point:04X} found"
+            diags.append(error("CONTROL-CHAR", rel, lineno, message))
         for pattern, label in PERSONAL_PATTERNS:
             if pattern.search(line):
-                diags.append(
-                    error(
-                        "PATH-PERSONAL",
-                        rel,
-                        lineno,
-                        f"{label}; use a placeholder or a relative path",
-                    )
-                )
+                message = f"{label}; use a placeholder or a repository-relative path"
+                diags.append(error("PATH-PERSONAL", rel, lineno, message))
                 break
         for pattern, label in SECRET_PATTERNS:
             if pattern.search(line):
-                diags.append(
-                    error(
-                        "SECRET-SHAPED",
-                        rel,
-                        lineno,
-                        f"possible {label}; remove it, and rotate it if real",
-                    )
-                )
+                message = f"possible {label}; remove it, and rotate it if it was real"
+                diags.append(error("SECRET-SHAPED", rel, lineno, message))
                 break
     return diags
 
 
 def scan_repository(root: Path) -> list[Diagnostic]:
-    """Run the text checks on every tracked-looking file under root."""
+    """Run the text scans over every file that :func:`iter_text_files` yields.
+
+    Parameters
+    ----------
+    root : Path
+        Repository root to scan.
+
+    Returns
+    -------
+    list of Diagnostic
+        All text-hygiene findings for the repository.
+    """
     diags: list[Diagnostic] = []
     for path in iter_text_files(root):
         rel = path.relative_to(root).as_posix()
@@ -550,7 +781,19 @@ def scan_repository(root: Path) -> list[Diagnostic]:
 
 
 def check_files(paths: list[Path]) -> list[Diagnostic]:
-    """Run only the text checks on the given files, such as issue body files."""
+    """Run only the text scans on the given files, such as issue body files.
+
+    Parameters
+    ----------
+    paths : list of Path
+        Files to scan.
+
+    Returns
+    -------
+    list of Diagnostic
+        ``FILE-MISSING`` for absent files, ``ENCODING`` for files that are not valid
+        UTF-8, and the text-hygiene findings for every other file.
+    """
     diags: list[Diagnostic] = []
     for path in paths:
         name = str(path)
@@ -568,7 +811,18 @@ def check_files(paths: list[Path]) -> list[Diagnostic]:
 
 
 def run(root: Path) -> list[Diagnostic]:
-    """Run every repository check against root and return all findings."""
+    """Run every repository check against a root and return all findings.
+
+    Parameters
+    ----------
+    root : Path
+        Repository root to check.
+
+    Returns
+    -------
+    list of Diagnostic
+        The findings from every check, in a stable order.
+    """
     diags = check_required_files(root)
     roadmap = root / "ROADMAP.md"
     if roadmap.is_file():
@@ -583,7 +837,23 @@ def run(root: Path) -> list[Diagnostic]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Command-line entry point. Returns the process exit status."""
+    """Run the validator from the command line.
+
+    Parameters
+    ----------
+    argv : list of str or None, optional
+        Arguments to parse. ``None`` reads ``sys.argv``.
+
+    Returns
+    -------
+    int
+        ``0`` when no errors were found, and ``1`` otherwise.
+
+    Raises
+    ------
+    SystemExit
+        When the argument parser rejects the arguments, or the root is not a directory.
+    """
     parser = argparse.ArgumentParser(description="Check the UBC-FRESH dev workflow surfaces.")
     parser.add_argument(
         "root",
@@ -597,13 +867,14 @@ def main(argv: list[str] | None = None) -> int:
         nargs="+",
         type=Path,
         metavar="PATH",
-        help="run only the text checks on these files, for example issue body files",
+        help="run only the text scans on these files, such as issue body files",
     )
     args = parser.parse_args(argv)
-    if args.files:
-        diags = check_files(args.files)
+    files: list[Path] | None = args.files
+    if files:
+        diags = check_files(files)
     else:
-        root = args.root.resolve()
+        root = Path(args.root).resolve()
         if not root.is_dir():
             parser.error(f"not a directory: {root}")
         diags = run(root)

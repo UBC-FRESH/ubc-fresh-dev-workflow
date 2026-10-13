@@ -4,7 +4,7 @@ project = "UBC-FRESH Dev Workflow"
 author = "UBC FRESH Lab"
 copyright = "2026, UBC FRESH Lab"
 
-extensions = []
+extensions: list[str] = []
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 html_theme = "sphinx_rtd_theme"

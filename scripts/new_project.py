@@ -2,17 +2,16 @@
 """Render the UBC-FRESH project seed into a new directory.
 
 The seed lives in ``templates/project/``. Files whose names end in ``.tmpl`` are
-rendered with the project tokens and written without the suffix. Every other file
-is copied unchanged. The validator is copied into the new project so the project
-can check its own planning surfaces, and the validator runs on the result before
-the script finishes.
+rendered with the project tokens and written without the suffix. Every other file is
+copied unchanged. The validator is copied into the new project, so the project can check
+its own planning surfaces, and the validator runs on the result before the script ends.
 
-Usage::
+Command-line usage::
 
     python scripts/new_project.py --name "My Project" --slug my-project --dest ../my-project
 
-This script does not contact GitHub. Creating a repository, a parent issue, or a
-branch needs maintainer approval, so the script prints the commands instead.
+This script does not contact GitHub. Creating a repository, a parent issue, or a branch
+needs maintainer approval, so the script prints the commands instead.
 """
 
 from __future__ import annotations
@@ -25,16 +24,18 @@ import subprocess
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-SEED_DIR = ROOT / "templates" / "project"
-VALIDATOR = ROOT / "scripts" / "check_workflow.py"
-TEMPLATE_SUFFIX = ".tmpl"
-NAME_RE = re.compile(r'^[^"\\\x00-\x1f]{2,80}$')
-SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]{1,62}$")
-OWNER_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9-]{0,38}$")
-PLACEHOLDER_RE = re.compile(r"\{\{[A-Z_]+\}\}")
-DEFAULT_PURPOSE = "Describe the purpose of this project in two sentences before Phase 0 starts."
-NEXT_STEPS = """
+ROOT: Path = Path(__file__).resolve().parent.parent
+SEED_DIR: Path = ROOT / "templates" / "project"
+VALIDATOR: Path = ROOT / "scripts" / "check_workflow.py"
+TEMPLATE_SUFFIX: str = ".tmpl"
+NAME_RE: re.Pattern[str] = re.compile(r'^[^"\\\x00-\x1f]{2,80}$')
+SLUG_RE: re.Pattern[str] = re.compile(r"^[a-z0-9][a-z0-9-]{1,62}$")
+OWNER_RE: re.Pattern[str] = re.compile(r"^[A-Za-z0-9][A-Za-z0-9-]{0,38}$")
+PLACEHOLDER_RE: re.Pattern[str] = re.compile(r"\{\{[A-Z_]+\}\}")
+DEFAULT_PURPOSE: str = (
+    "Describe the purpose of this project in two sentences before Phase 0 starts."
+)
+NEXT_STEPS: str = """
 Next steps. The GitHub steps need maintainer approval first.
   cd {dest}
   git init -b main
@@ -48,12 +49,39 @@ Next steps. The GitHub steps need maintainer approval first.
 
 
 def slugify(name: str) -> str:
-    """Derive a repository slug from a project name."""
+    """Derive a repository slug from a project name.
+
+    Parameters
+    ----------
+    name : str
+        Human-readable project name.
+
+    Returns
+    -------
+    str
+        Lowercase letters, digits, and hyphens, with no leading or trailing hyphen, and at
+        most 63 characters long.
+    """
     return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")[:63]
 
 
 def validate_inputs(name: str, slug: str, owner: str) -> None:
-    """Reject values that would break rendered files or GitHub names."""
+    """Reject values that would break rendered files or GitHub names.
+
+    Parameters
+    ----------
+    name : str
+        Human-readable project name. It is written into Python and reStructuredText.
+    slug : str
+        Repository slug. It becomes the repository name.
+    owner : str
+        GitHub owner name. It appears in the next-step commands and the Sphinx metadata.
+
+    Raises
+    ------
+    ValueError
+        When any value fails its pattern.
+    """
     if not NAME_RE.match(name):
         raise ValueError(
             "project name must be 2 to 80 characters, without quotes, backslashes, "
@@ -69,7 +97,28 @@ def validate_inputs(name: str, slug: str, owner: str) -> None:
 
 
 def build_tokens(name: str, slug: str, owner: str, purpose: str, today: str) -> dict[str, str]:
-    """Return the token-to-value map used to render the seed."""
+    """Build the token-to-value map that renders the seed.
+
+    Parameters
+    ----------
+    name : str
+        Project name, which fills the ``{{PROJECT_NAME}}`` token.
+    slug : str
+        Repository slug, which fills the ``{{PROJECT_SLUG}}`` token.
+    owner : str
+        GitHub owner, which fills the ``{{OWNER}}`` token.
+    purpose : str
+        One or two sentences of purpose, which fill the ``{{PROJECT_PURPOSE}}`` token.
+    today : str
+        ISO date of the render, which fills the ``{{TODAY}}`` token. The first four
+        characters also fill the ``{{YEAR}}`` token.
+
+    Returns
+    -------
+    dict of str to str
+        Each placeholder token mapped to its value. ``{{TITLE_RULE}}`` is an underline of
+        ``=`` characters as long as the project name.
+    """
     return {
         "{{PROJECT_NAME}}": name,
         "{{PROJECT_SLUG}}": slug,
@@ -82,14 +131,46 @@ def build_tokens(name: str, slug: str, owner: str, purpose: str, today: str) -> 
 
 
 def render(text: str, tokens: dict[str, str]) -> str:
-    """Replace every token in text with its value."""
+    """Replace every token in a text with its value.
+
+    Parameters
+    ----------
+    text : str
+        Template text that may contain tokens.
+    tokens : dict of str to str
+        Token-to-value map from :func:`build_tokens`.
+
+    Returns
+    -------
+    str
+        The text with every known token replaced. Unknown tokens are left in place, and
+        :func:`create_project` rejects them.
+    """
     for token, value in tokens.items():
         text = text.replace(token, value)
     return text
 
 
 def plan_seed(seed_dir: Path) -> list[tuple[Path, Path, bool]]:
-    """Return (source, destination relative path, is_template) for every seed file."""
+    """List every file that a new project receives, with its source and destination.
+
+    Parameters
+    ----------
+    seed_dir : Path
+        Directory that holds the seed templates.
+
+    Returns
+    -------
+    list of tuple of (Path, Path, bool)
+        For each output file: the source path, the destination path relative to the new
+        project, and whether the source is a template that needs rendering. The validator
+        is included as a copied file.
+
+    Raises
+    ------
+    ValueError
+        When two sources would write the same destination.
+    """
     plan: list[tuple[Path, Path, bool]] = []
     for source in sorted(seed_dir.rglob("*")):
         if not source.is_file():
@@ -101,6 +182,10 @@ def plan_seed(seed_dir: Path) -> list[tuple[Path, Path, bool]]:
         else:
             plan.append((source, relative, False))
     plan.append((VALIDATOR, Path("scripts") / VALIDATOR.name, False))
+    targets = [target for _, target, _ in plan]
+    duplicates = sorted({str(t) for t in targets if targets.count(t) > 1})
+    if duplicates:
+        raise ValueError(f"seed writes the same destination twice: {', '.join(duplicates)}")
     return plan
 
 
@@ -114,16 +199,44 @@ def create_project(
     today: str,
     force: bool,
 ) -> list[Path]:
-    """Render the seed into dest and return the written paths."""
+    """Render the seed into a destination directory.
+
+    Parameters
+    ----------
+    name : str
+        Human-readable project name.
+    slug : str
+        Repository slug.
+    dest : Path
+        Directory to create or fill.
+    owner : str
+        GitHub owner name.
+    purpose : str
+        One or two sentences of purpose.
+    today : str
+        ISO date of the render.
+    force : bool
+        When ``True``, existing files at the destination are overwritten.
+
+    Returns
+    -------
+    list of Path
+        Every file that was written.
+
+    Raises
+    ------
+    ValueError
+        When an input fails validation.
+    FileExistsError
+        When the destination is not empty, or a file would be overwritten without ``force``.
+    RuntimeError
+        When a placeholder survives rendering.
+    """
     validate_inputs(name, slug, owner)
     if dest.exists() and any(dest.iterdir()) and not force:
         raise FileExistsError(f"{dest} is not empty; choose another --dest or pass --force")
     plan = plan_seed(SEED_DIR)
     targets = [dest / target for _, target, _ in plan]
-    if not force:
-        existing = [target for target in targets if target.exists()]
-        if existing:
-            raise FileExistsError(f"{existing[0]} already exists; pass --force to overwrite")
     tokens = build_tokens(name, slug, owner, purpose, today)
     written: list[Path] = []
     for (source, relative, is_template), target in zip(plan, targets, strict=True):
@@ -140,7 +253,18 @@ def create_project(
 
 
 def run_validator(dest: Path) -> subprocess.CompletedProcess[str]:
-    """Run the validator that was copied into the new project."""
+    """Run the validator that was copied into a new project.
+
+    Parameters
+    ----------
+    dest : Path
+        Root of the new project.
+
+    Returns
+    -------
+    subprocess.CompletedProcess of str
+        The finished process, with its captured standard output and standard error.
+    """
     return subprocess.run(
         [sys.executable, str(dest / "scripts" / VALIDATOR.name), str(dest)],
         capture_output=True,
@@ -150,7 +274,19 @@ def run_validator(dest: Path) -> subprocess.CompletedProcess[str]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Command-line entry point. Returns the process exit status."""
+    """Run the initializer from the command line.
+
+    Parameters
+    ----------
+    argv : list of str or None, optional
+        Arguments to parse. ``None`` reads ``sys.argv``.
+
+    Returns
+    -------
+    int
+        ``0`` on success, ``1`` when the generated project fails validation, and ``2`` when
+        the inputs are rejected.
+    """
     parser = argparse.ArgumentParser(description="Render the UBC-FRESH project seed.")
     parser.add_argument("--name", required=True, help="human-readable project name")
     parser.add_argument("--slug", help="repository slug (default: derived from --name)")
@@ -159,7 +295,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--purpose", default=DEFAULT_PURPOSE, help="one or two sentences")
     parser.add_argument("--force", action="store_true", help="overwrite existing files")
     args = parser.parse_args(argv)
-    slug = args.slug or slugify(args.name)
+    slug: str = args.slug or slugify(args.name)
     try:
         written = create_project(
             name=args.name,

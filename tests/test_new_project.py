@@ -3,16 +3,32 @@
 from __future__ import annotations
 
 import re
+import subprocess
 from pathlib import Path
 
-import new_project as initializer
 import pytest
 
-TEXT_SUFFIXES = {".md", ".rst", ".txt", ".yml", ".py", ".cff", ".toml"}
-PLACEHOLDER = re.compile(r"\{\{[A-Z_]+\}\}")
+import new_project as initializer
+
+TEXT_SUFFIXES: frozenset[str] = frozenset({".md", ".rst", ".txt", ".yml", ".py", ".cff", ".toml"})
+PLACEHOLDER: re.Pattern[str] = re.compile(r"\{\{[A-Z_]+\}\}")
 
 
 def render_demo(dest: Path, *, force: bool = False) -> list[Path]:
+    """Render the seed with fixed demo inputs.
+
+    Parameters
+    ----------
+    dest : Path
+        Destination directory.
+    force : bool, optional
+        Whether existing files may be overwritten.
+
+    Returns
+    -------
+    list of Path
+        The files that were written.
+    """
     return initializer.create_project(
         name="Demo Project",
         slug="demo-project",
@@ -24,7 +40,8 @@ def render_demo(dest: Path, *, force: bool = False) -> list[Path]:
     )
 
 
-def test_renders_seed_without_leftover_placeholders(tmp_path):
+def test_renders_seed_without_leftover_placeholders(tmp_path: Path) -> None:
+    """Every rendered text file is free of placeholder tokens, and the names are filled in."""
     dest = tmp_path / "demo"
     render_demo(dest)
     assert (dest / "AGENTS.md").is_file()
@@ -35,44 +52,136 @@ def test_renders_seed_without_leftover_placeholders(tmp_path):
     assert "Demo Project" in (dest / "README.md").read_text(encoding="utf-8")
 
 
-def test_generated_project_passes_the_validator(tmp_path):
+def test_generated_project_passes_the_validator(tmp_path: Path) -> None:
+    """A generated project passes the validator that was copied into it."""
     dest = tmp_path / "demo"
     render_demo(dest)
     result = initializer.run_validator(dest)
     assert result.returncode == 0, result.stdout + result.stderr
 
 
-def test_refuses_to_overwrite_without_force(tmp_path):
+def test_refuses_to_fill_a_non_empty_directory_without_force(tmp_path: Path) -> None:
+    """A non-empty destination is kept unless the caller forces the render."""
     dest = tmp_path / "demo"
     dest.mkdir()
     (dest / "AGENTS.md").write_text("mine\n", encoding="utf-8")
-    with pytest.raises(FileExistsError):
+    with pytest.raises(FileExistsError, match="not empty"):
         render_demo(dest)
+    assert (dest / "AGENTS.md").read_text(encoding="utf-8") == "mine\n"
     render_demo(dest, force=True)
     assert (dest / "AGENTS.md").read_text(encoding="utf-8") != "mine\n"
 
 
-def test_rejects_an_invalid_slug(tmp_path):
-    with pytest.raises(ValueError):
+@pytest.mark.parametrize(
+    ("name", "slug", "owner", "match"),
+    [
+        ("D", "demo", "UBC-FRESH", "project name"),
+        ('Bad "name"', "demo", "UBC-FRESH", "project name"),
+        ("Demo", "Bad Slug", "UBC-FRESH", "slug"),
+        ("Demo", "demo", "-bad-owner", "owner"),
+    ],
+)
+def test_rejects_invalid_inputs(
+    tmp_path: Path, name: str, slug: str, owner: str, match: str
+) -> None:
+    """Names, slugs, and owners that would break rendered files are rejected."""
+    with pytest.raises(ValueError, match=match):
         initializer.create_project(
-            name="Demo",
-            slug="Bad Slug",
+            name=name,
+            slug=slug,
             dest=tmp_path / "demo",
-            owner="UBC-FRESH",
+            owner=owner,
             purpose="A demo.",
             today="2026-10-13",
             force=False,
         )
 
 
-def test_slugify_produces_a_valid_slug():
+def test_slugify_produces_a_valid_slug() -> None:
+    """A project name becomes a slug that passes the slug pattern."""
     slug = initializer.slugify("My Project: Phase 1!")
     assert slug == "my-project-phase-1"
     assert initializer.SLUG_RE.match(slug)
 
 
-def test_command_line_derives_the_slug_and_validates(tmp_path, capsys):
+def test_slugify_limits_the_length() -> None:
+    """A very long name is cut to the 63-character slug limit."""
+    assert len(initializer.slugify("a" * 200)) == 63
+
+
+def test_build_tokens_fills_the_title_rule_and_the_year() -> None:
+    """The title underline matches the name length, and the year comes from the date."""
+    tokens = initializer.build_tokens("Demo", "demo", "UBC-FRESH", "Purpose.", "2026-10-13")
+    assert tokens["{{TITLE_RULE}}"] == "===="
+    assert tokens["{{YEAR}}"] == "2026"
+
+
+def test_render_leaves_unknown_tokens_in_place() -> None:
+    """Known tokens are replaced, and unknown tokens are left for the caller to reject."""
+    tokens = {"{{PROJECT_NAME}}": "Demo"}
+    assert initializer.render("{{PROJECT_NAME}} {{OTHER}}", tokens) == "Demo {{OTHER}}"
+
+
+def test_plan_seed_includes_the_validator_and_skips_directories(tmp_path: Path) -> None:
+    """The plan covers every seed file, marks templates, and copies the validator."""
+    (tmp_path / "nested").mkdir()
+    (tmp_path / "nested" / "plain.txt").write_text("plain\n", encoding="utf-8")
+    (tmp_path / "rendered.md.tmpl").write_text("{{PROJECT_NAME}}\n", encoding="utf-8")
+    plan = initializer.plan_seed(tmp_path)
+    destinations = {str(target): is_template for _, target, is_template in plan}
+    assert destinations["rendered.md"] is True
+    assert destinations[str(Path("nested") / "plain.txt")] is False
+    assert destinations[str(Path("scripts") / "check_workflow.py")] is False
+
+
+def test_plan_seed_rejects_two_sources_for_one_destination(tmp_path: Path) -> None:
+    """Two seed files that write the same destination are rejected before rendering."""
+    (tmp_path / "AGENTS.md").write_text("one\n", encoding="utf-8")
+    (tmp_path / "AGENTS.md.tmpl").write_text("two\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="same destination"):
+        initializer.plan_seed(tmp_path)
+
+
+def test_unrendered_placeholder_is_a_runtime_error(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A template with an unknown placeholder fails the render instead of leaking it."""
+    seed = tmp_path / "seed"
+    seed.mkdir()
+    (seed / "BROKEN.md.tmpl").write_text("{{NOT_A_TOKEN}}\n", encoding="utf-8")
+    monkeypatch.setattr(initializer, "SEED_DIR", seed)
+    with pytest.raises(RuntimeError, match="unrendered"):
+        render_demo(tmp_path / "out")
+
+
+def test_command_line_derives_the_slug_and_validates(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """The command derives the slug from the name, prints next steps, and returns 0."""
     dest = tmp_path / "demo"
     assert initializer.main(["--name", "Demo Project", "--dest", str(dest)]) == 0
-    assert "demo-project" in capsys.readouterr().out
+    output = capsys.readouterr().out
+    assert "demo-project" in output
+    assert "gh repo create UBC-FRESH/demo-project" in output
     assert (dest / "ROADMAP.md").is_file()
+
+
+def test_command_line_returns_two_for_rejected_inputs(tmp_path: Path) -> None:
+    """A rejected input makes the command return status 2 and write nothing."""
+    assert initializer.main(["--name", "x", "--dest", str(tmp_path / "demo")]) == 2
+    assert not (tmp_path / "demo").exists()
+
+
+def test_command_line_returns_one_when_the_generated_project_fails(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """A generated project that fails the validator makes the command return status 1."""
+
+    def failing(dest: Path) -> subprocess.CompletedProcess[str]:
+        return subprocess.CompletedProcess(
+            args=[str(dest)], returncode=1, stdout="", stderr="bad\n"
+        )
+
+    monkeypatch.setattr(initializer, "run_validator", failing)
+    assert initializer.main(["--name", "Demo", "--dest", str(tmp_path / "demo")]) == 1
+    assert "failed validation" in capsys.readouterr().err
