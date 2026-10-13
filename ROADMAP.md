@@ -6,8 +6,8 @@ This roadmap is the plan of record and the issue tracker map for this repository
 
 | Phase | Parent issue | Branch | Status |
 | --- | --- | --- | --- |
-| P0 Bootstrap scaffold | #1 | `feature/p0-bootstrap-scaffold` | pr-open |
-| P1 Dogfood and validation | #9 | `feature/p1-dogfood-validation` | planned |
+| P0 Bootstrap scaffold | #1 | `feature/p0-bootstrap-scaffold` | complete |
+| P1 Dogfood and validation | #9 | `feature/p1-dogfood-validation` | active |
 | P2 Dev server kit | #10 | `feature/p2-dev-server-kit` | planned |
 | P3 Lifecycle playbooks and deployment | #11 | `feature/p3-lifecycle-playbooks` | planned |
 | P4 v0.1.0 public release and onboarding | #12 | `feature/p4-v0.1.0-release` | planned |
@@ -39,7 +39,7 @@ Every project built from the seed moves through the same stages. This table show
 
 Parent issue: #1
 Branch: `feature/p0-bootstrap-scaffold`
-Status: pr-open
+Status: complete
 
 Goal: make the repository a self-describing seed. The workflow is documented in an agent-friendly Sphinx site. A project seed, a validator, and a green dashboard enforce it. Every commit must pass the full dashboard. The API is typed and documented, and the embedded capability pattern is specified. The repository is built with the pattern it describes.
 
@@ -105,13 +105,31 @@ Phase 0 verification:
 
 Parent issue: #9
 Branch: `feature/p1-dogfood-validation`
-Status: planned
+Status: active
 
 Goal: prove the seed works end to end on a throwaway project. Run the loop once, record every failure, and fix or file each one.
 
-- [ ] P1.1 Generate and exercise the synthetic demo project
-- [ ] P1.2 Fresh-clone rehearsal of this repository's checks
-- [ ] P1.3 Friction log, fixes, and validator gap list
+- [ ] P1.1 Generate and exercise the synthetic demo project (#18)
+- [ ] P1.2 Fresh-clone rehearsal of this repository's checks (#19)
+- [ ] P1.3 Friction log, fixes, and validator gap list (#20)
+- [ ] P1.4 Walk mode honors the root `.gitignore`, with a test (#21)
+- [ ] P1.5 Coverage gate ratchet to 95 percent (#22)
+- [ ] P1.6 Close-out rehearsal on the demo project (#23)
+
+Acceptance criteria:
+
+- The demo renders, its validator reports no errors, and its dashboard is green.
+- A fresh clone of this repository passes the dashboard.
+- The friction log lists every failure, and each entry names its fix, its deferred issue, or its accepted reason.
+- Walk mode honors `.gitignore`, and the coverage gate is 95 percent.
+- The demo's close-out report is queued and approved.
+
+Phase 1 verification:
+
+- `python scripts/new_project.py --name "Synthetic Demo" --slug synthetic-demo --dest tmp/synthetic-demo`
+- `python scripts/check_workflow.py tmp/synthetic-demo`
+- `python tmp/synthetic-demo/scripts/dashboard.py`
+- `python scripts/dashboard.py`
 
 ## Phase 2: Dev server kit
 
@@ -165,10 +183,11 @@ Goal: keep the seed current: triage incoming ideas, review it on a cadence, and 
 
 ## Detailed Next Steps Notes
 
-1. Phase 0 is queued for approval. Pull request #17 is open, and its CI is green on the evidence head `2cf80b9`. The close-out report is `notes/reports/p0-closeout.md`, and its recommendation lists the actions. After the maintainer approves them, the agent carries them out in this order, and reads back each result: squash-merge #17 and delete its branch, enable GitHub Pages from the Actions source, require the four CI checks on `main`, close #1 with a closeout comment, and launch Phase 1.
-2. Launching Phase 1 means creating `feature/p1-dogfood-validation` from the merged `main`. In its first commit, set P0 to `complete` and P1 to `active` in this file and in the tracker map. Then create the P1 child issues as sub-issues of #9, and start P1.1.
-3. Recommended defaults for the open choices. The report asks for approval of each one, and the maintainer may change it there:
-   - Seed issue forms (YAML) are deferred to the P1 friction log. The default is Markdown templates only, until a dogfood run shows the need.
+1. Phase 0 is complete. Pull request #17 merged as `2943d83`, GitHub Pages is live, branch protection requires the four CI checks on `main`, and #1 is closed.
+2. Phase 1 is active. Its child tasks are #18 to #23, under the parent #9. P1.1 has started, and its first move is recorded on #18.
+3. Phase 1 closes with its own close-out report, `notes/reports/p1-closeout.md`, queued in a pull request. The maintainer approves the report. Then the agent squash-merges the pull request, closes #9, and deletes the branch.
+4. Recommended defaults, as approved with the Phase 0 close-out. The Phase 1 report can change them:
+   - Seed issue forms (YAML) stay deferred. The default is Markdown templates, until the friction log shows the need.
    - `scripts/new_project.py` keeps writing local files only. Creating a repository stays a separate approved action.
-   - The seed carries the MIT license, as the lab's other public repositories do.
-   - The 90 percent branch-coverage gate holds in P0. P1 ratchets it to 95 percent.
+   - The seed carries the MIT license.
+   - The coverage gate is 90 percent through P0. P1.5 raises it to 95 percent.
