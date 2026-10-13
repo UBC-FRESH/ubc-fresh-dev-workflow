@@ -2,8 +2,10 @@ Host and containers
 ===================
 
 This page covers the server, the base container, and one container per project. The
-commands come from the upstream LXD documentation. Names such as ``fresh-project-a``
-and paths such as ``/srv/projects/project-a`` are examples; replace them.
+installation steps follow the upstream LXD install page. The other commands are written
+from the LXD reference and have not been re-checked against it. The P2 scripts will
+re-check them. Names such as ``fresh-project-a`` and paths such as
+``/srv/projects/project-a`` are examples; replace them.
 
 Host requirements
 -----------------

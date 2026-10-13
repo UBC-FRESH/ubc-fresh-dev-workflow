@@ -1,8 +1,8 @@
 IDE, agents, and models
 =======================
 
-Run these steps inside the project container. Each tool's upstream documentation is
-the source for its commands.
+Run these steps inside the project container. Each tool's upstream documentation is the
+reference for its commands. Check a command against that documentation when it fails.
 
 code-server: the browser IDE
 ----------------------------
