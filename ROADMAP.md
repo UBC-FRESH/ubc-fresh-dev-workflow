@@ -6,7 +6,7 @@ This roadmap is the plan of record and the issue tracker map for this repository
 
 | Phase | Parent issue | Branch | Status |
 | --- | --- | --- | --- |
-| P0 Bootstrap scaffold | #1 | `feature/p0-bootstrap-scaffold` | active |
+| P0 Bootstrap scaffold | #1 | `feature/p0-bootstrap-scaffold` | pr-open |
 | P1 Dogfood and validation | #9 | `feature/p1-dogfood-validation` | planned |
 | P2 Dev server kit | #10 | `feature/p2-dev-server-kit` | planned |
 | P3 Lifecycle playbooks and deployment | #11 | `feature/p3-lifecycle-playbooks` | planned |
@@ -38,7 +38,7 @@ Every project built from the seed moves through the same stages. This table show
 
 Parent issue: #1
 Branch: `feature/p0-bootstrap-scaffold`
-Status: active
+Status: pr-open
 
 Goal: make the repository a self-describing seed. The workflow is documented in an agent-friendly Sphinx site. A project seed, a validator, and a green dashboard enforce it. Every commit must pass the full dashboard. The API is typed and documented, and the embedded capability pattern is specified. The repository is built with the pattern it describes.
 
@@ -79,10 +79,10 @@ Goal: make the repository a self-describing seed. The workflow is documented in 
 - [x] P0.9 Embedded capability pattern, documented with conformance checks (#16)
   - [x] docs/agents/embedded-capabilities.rst with the contract and conformance checklist
   - [x] ADR 0007, and links from the agents index and llms.txt
-- [ ] P0.10 Phase closeout and review handoff (#8)
+- [x] P0.10 Phase closeout and review handoff (#8)
   - [x] Acceptance commands and dashboard recorded in the changelog
   - [x] Child issues closed with closeout comments
-  - [ ] Pull request opened for maintainer review
+  - [x] Pull request opened for maintainer review
 
 Acceptance criteria:
 
@@ -163,11 +163,10 @@ Goal: keep the seed current: triage incoming ideas, review it on a cadence, and 
 
 ## Detailed Next Steps Notes
 
-1. P0.1 to P0.9 are complete on the branch, and their child issues are closed with closeout comments. P0.10 (#8) is in progress: it records the result, opens the pull request, and then closes #8 and updates the parent. The agent does not merge the pull request.
-2. P0.10 closes the phase. It opens the pull request, which is the review artifact. The agent does not merge it.
-3. After the maintainer merges P0: confirm the CI and docs workflows on `main`, enable GitHub Pages from the workflow (maintainer approval), require the CI checks in branch protection (maintainer approval; see `docs/reference/quality-gates.rst`), and close #1.
-4. Activate P1 only with maintainer approval. Then create its child issues as sub-issues of #9, and create `feature/p1-dogfood-validation` from `main`.
-5. Open questions for the maintainer:
+1. Pull request #17 is open, and CI is green on its head commit. The maintainer reviews and merges it. The agent does not merge it.
+2. After the merge: confirm the CI and docs workflows on `main`, enable GitHub Pages from the workflow (maintainer approval), require the CI jobs in branch protection (maintainer approval; see `docs/reference/quality-gates.rst`), and close #1.
+3. Activate P1 only with maintainer approval. Then create its child issues as sub-issues of #9, and create `feature/p1-dogfood-validation` from `main`.
+4. Open questions for the maintainer:
    - Should the seed also ship GitHub issue forms (YAML) next to the Markdown templates?
    - Should `new_project.py` create the GitHub repository itself? It does not today, because GitHub mutations need approval. A flag could add that later.
    - Should the seed carry the same MIT license as the lab's other public repositories? Assumed yes.
