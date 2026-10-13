@@ -35,6 +35,18 @@ PLACEHOLDER_RE: re.Pattern[str] = re.compile(r"\{\{[A-Z_]+\}\}")
 DEFAULT_PURPOSE: str = (
     "Describe the purpose of this project in two sentences before Phase 0 starts."
 )
+SHARED_FRAMEWORK_FILES: tuple[str, ...] = (
+    "scripts/check_workflow.py",
+    "scripts/dashboard.py",
+    "tests/conftest.py",
+    "tests/test_check_workflow.py",
+    "tests/test_cli.py",
+    "tests/test_dashboard.py",
+    "tests/test_properties.py",
+    "pyproject.toml",
+    "requirements-dev.txt",
+    ".pre-commit-config.yaml",
+)
 NEXT_STEPS: str = """
 Next steps. The GitHub steps need maintainer approval first.
   cd {dest}
@@ -163,8 +175,9 @@ def plan_seed(seed_dir: Path) -> list[tuple[Path, Path, bool]]:
     -------
     list of tuple of (Path, Path, bool)
         For each output file: the source path, the destination path relative to the new
-        project, and whether the source is a template that needs rendering. The validator
-        is included as a copied file.
+        project, and whether the source is a template that needs rendering. The shared
+        framework files, such as the validator and the dashboard, are copied from this
+        repository.
 
     Raises
     ------
@@ -181,7 +194,8 @@ def plan_seed(seed_dir: Path) -> list[tuple[Path, Path, bool]]:
             plan.append((source, target, True))
         else:
             plan.append((source, relative, False))
-    plan.append((VALIDATOR, Path("scripts") / VALIDATOR.name, False))
+    for rel in SHARED_FRAMEWORK_FILES:
+        plan.append((ROOT / rel, Path(rel), False))
     targets = [target for _, target, _ in plan]
     duplicates = sorted({str(t) for t in targets if targets.count(t) > 1})
     if duplicates:

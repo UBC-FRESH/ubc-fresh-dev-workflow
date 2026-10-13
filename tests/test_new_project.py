@@ -154,6 +154,15 @@ def test_unrendered_placeholder_is_a_runtime_error(
         render_demo(tmp_path / "out")
 
 
+def test_generated_project_carries_the_shared_gates(tmp_path: Path) -> None:
+    """A generated project receives the validator, the dashboard, and the gate configuration."""
+    dest = tmp_path / "demo"
+    render_demo(dest)
+    for rel in initializer.SHARED_FRAMEWORK_FILES:
+        assert (dest / rel).is_file(), rel
+    assert "[tool.mypy]" in (dest / "pyproject.toml").read_text(encoding="utf-8")
+
+
 def test_command_line_derives_the_slug_and_validates(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:

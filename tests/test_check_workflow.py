@@ -15,6 +15,8 @@ import pytest
 import check_workflow as cw
 
 FORM_FEED: str = chr(12)
+TOKEN_OPEN: str = "{" * 2
+TOKEN_CLOSE: str = "}" * 2
 BOM: str = chr(0xFEFF)
 HOME_PREFIX: str = "/" + "home" + "/" + "someone" + "/"
 MAC_PREFIX: str = "/" + "Users" + "/" + "someone" + "/"
@@ -363,7 +365,7 @@ def test_local_link_to_an_existing_file_passes(tmp_path: Path) -> None:
         "[mail](mailto:someone@example.org)",
         "[top](#demo)",
         "[template](<placeholder>)",
-        "[token]({{PROJECT_NAME}})",
+        "[token](" + TOKEN_OPEN + "PROJECT_NAME" + TOKEN_CLOSE + ")",
     ],
 )
 def test_external_anchor_and_placeholder_links_are_ignored(tmp_path: Path, link: str) -> None:
