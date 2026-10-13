@@ -6,7 +6,8 @@
 
 - [Session protocol](agents/session-protocol.html): the steps to follow at the start of every session.
 - [Workflow model](reference/workflow-model.html): phases, tasks, subtasks, IDs, and status values.
-- [Approval gates](reference/approval-gates.html): what an agent may do without asking.
+- [Approval gates](reference/approval-gates.html): what an agent may do without asking, and what waits for approval.
+- [Phase close-out](reference/phase-closeout.html): how a phase ends, with its report, its approval, and its execution.
 
 ## Reference
 

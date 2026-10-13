@@ -68,7 +68,8 @@ must say what its validator checks and what it does not.
 ## CI and merges
 
 - CI runs every gate on every pull request, and on every push to `main`.
-- No pull request merges while CI is red. The agent does not merge; the maintainer does.
+- No pull request merges while CI is red.
+- A merge happens only as part of an approved phase close-out. Queue the pull request, write the report in `notes/reports/`, and wait for the maintainer's approval.
 
 ## Planning workflow
 
@@ -82,10 +83,9 @@ must say what its validator checks and what it does not.
 You may, within the active phase: create and commit to its branch, push that branch, open and update
 its issues and pull requests, and run local checks.
 
-You must ask, and wait for an explicit answer, before you: activate a phase; merge a pull request;
-close a parent issue; create a tag or a release; change repository visibility, settings, or branch
-protection; create an external account, repository, or server; touch private data or credentials; or
-delete anything.
+After the maintainer approves a phase close-out, carry out what the report recommends: squash-merge the pull request, delete its branch, close the parent issue, and launch the next phase. Name every settings change, tag, release, or external account in the report, with its exact command, and wait for approval of each one.
+
+You must wait for an explicit approval before you: create a tag or a release; change repository visibility, settings, or branch protection; create an external account, repository, or server; touch private data or credentials; or delete anything beyond the branch that an approved report names.
 
 ## GitHub hygiene
 

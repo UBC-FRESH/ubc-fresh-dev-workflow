@@ -28,10 +28,10 @@ Pull requests
   (#1)``.
 - Body: ``Part of #<parent>``, the child issues with their status, the
   verification commands and their results, and anything deferred.
-- The maintainer merges with a squash merge, so that ``main`` gains one commit per
-  phase. The squash commit keeps the phase ID and the pull request number in its
-  title.
-- The agent does not merge. The maintainer does.
+- Merge with a squash merge, so that ``main`` gains one commit per phase. The squash
+  commit keeps the phase ID and the pull request number in its title.
+- The agent merges a phase pull request only after the maintainer approves its
+  close-out report. See :doc:`approval-gates` and :doc:`phase-closeout`.
 
 Tags and releases
 -----------------

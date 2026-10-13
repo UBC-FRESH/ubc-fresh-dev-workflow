@@ -67,14 +67,41 @@ Continuous integration
   uploads the JSON record as an artifact.
 - The ``pre-commit`` job runs every hook on the whole repository.
 
-Required status checks (maintainer action)
-------------------------------------------
+Required status checks (approved settings change)
+--------------------------------------------------
 
 Branch protection makes a pull request mergeable only when the required checks pass. The
-agent cannot set this, because it is a repository setting. A maintainer sets it in the
-repository settings, under Branches, with a rule for ``main``. The required checks are
-the ``quality`` job for each Python version, the ``dashboard`` job, and the
-``pre-commit`` job. Do not merge a pull request while any of them is red.
+close-out report that recommends it names the command below. The agent runs the command
+after the maintainer approves that item, and reads the rule back with
+``gh api repos/OWNER/REPO/branches/main/protection``. The required checks are the
+``quality`` job for each Python version, the ``dashboard`` job, and the ``pre-commit``
+job. Do not merge a pull request while any of them is red.
+
+.. code-block:: bash
+
+   gh api -X PUT repos/OWNER/REPO/branches/main/protection --input - <<'JSON'
+   {
+     "required_status_checks": {
+       "strict": true,
+       "contexts": [
+         "Quality gates, Python 3.11",
+         "Quality gates, Python 3.12",
+         "Green dashboard summary",
+         "Pre-commit parity"
+       ]
+     },
+     "enforce_admins": false,
+     "required_pull_request_reviews": null,
+     "restrictions": null,
+     "allow_force_pushes": false,
+     "allow_deletions": false
+   }
+   JSON
+
+No approving review is required. The phase pull requests are opened from the maintainer's
+account, and GitHub does not let an author approve their own pull request. The maintainer's
+approval of the close-out report is the review. Administrators are not enforced, so the
+maintainer can still act in an emergency. The report must name any use of that path.
 
 Changing a gate
 ---------------

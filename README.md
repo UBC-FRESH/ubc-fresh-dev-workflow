@@ -70,10 +70,10 @@ and [quality gates](docs/reference/quality-gates.rst).
 
 ## Status
 
-Phase P0, the bootstrap scaffold, is in progress on the branch `feature/p0-bootstrap-scaffold`. It was
-reopened to add the quality gates, the typed API reference, and the embedded capability pattern. It
-waits for maintainer review once its pull request is open. The live status of every phase is in
-[`ROADMAP.md`](ROADMAP.md) and in the GitHub issues.
+Phase P0, the bootstrap scaffold, is complete on the branch `feature/p0-bootstrap-scaffold`. It was
+reopened to add the quality gates, the typed API reference, and the embedded capability pattern. Its
+pull request, #17, is queued for approval with a close-out report, and it has not merged. The live
+status of every phase is in [`ROADMAP.md`](ROADMAP.md) and in the GitHub issues.
 
 ## Repository map
 

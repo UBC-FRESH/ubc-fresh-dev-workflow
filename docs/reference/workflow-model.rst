@@ -72,7 +72,7 @@ Status values
        child issues exist.
    * - ``pr-open``
      - Every task is done or explicitly deferred. The pull request to ``main`` is
-       open and waits for review.
+       open. The close-out report is queued for the maintainer's approval.
    * - ``complete``
      - The pull request merged, and the parent issue is closed. Every task is
        checked.

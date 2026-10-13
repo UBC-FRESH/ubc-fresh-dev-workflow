@@ -58,3 +58,11 @@ What good reporting looks like
 - It states the blocker, if there is one, with the exact error text.
 - It ends with the next move you propose, and waits for approval if that move
   needs it.
+
+Phase close-out
+---------------
+
+When every task in the phase is complete, do not end the phase with this list. Follow
+:doc:`../reference/phase-closeout`. Queue the pull request, write the close-out report,
+and wait for the maintainer's approval before you merge, close the parent issue, delete
+the branch, or launch the next phase.

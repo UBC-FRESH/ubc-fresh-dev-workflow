@@ -9,6 +9,7 @@ Notes are the persistent, agent-friendly context for this project. They hold wha
 | Decisions | `notes/adr/NNNN-slug.md` | One decision per file. Never rewrite an accepted ADR; supersede it with a new one. |
 | Reference notes | `notes/reference/*.md` | Facts with provenance: where they came from, how they were read, and what is uncertain. |
 | Focused plans | `notes/*.md` | Detail too long for `ROADMAP.md`. Linked from the roadmap task. Kept current while the task is active. |
+| Phase close-out reports | `notes/reports/*.md` | One report per phase, written at close-out from the seed's `phase-closeout-template.md`. It is the evidence for the maintainer's approval. Later facts go in the changelog. |
 
 ## Rules
 
@@ -26,4 +27,6 @@ Notes are the persistent, agent-friendly context for this project. They hold wha
 - [ADR 0005: strict typing and numpy docstrings](adr/0005-strict-typing-and-docstrings.md)
 - [ADR 0006: the green dashboard rule](adr/0006-green-dashboard-rule.md)
 - [ADR 0007: embedded agent capabilities, validated and advisory](adr/0007-embedded-capabilities-pattern.md)
+- [ADR 0008: phase close-out, with approval before execution](adr/0008-phase-closeout-and-execution.md)
 - [Pattern survey](reference/pattern-survey.md): a sanitized survey of public UBC-FRESH repositories
+- [P0 close-out report](reports/p0-closeout.md): the evidence and the approval request for Phase 0

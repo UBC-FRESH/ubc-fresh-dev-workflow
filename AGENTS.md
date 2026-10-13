@@ -102,9 +102,8 @@ budget. No oracle, no capability. Details, including the conformance checklist, 
 ## CI and merges
 
 - CI runs every gate on every pull request, and on every push to `main`.
-- No pull request merges while CI is red. A maintainer makes the CI jobs required in branch
-  protection.
-- The agent does not merge. The maintainer does.
+- No pull request merges while CI is red. Branch protection makes the CI jobs required.
+- A merge happens only as part of an approved phase close-out. See [phase close-out](docs/reference/phase-closeout.rst).
 
 ## Planning workflow
 
@@ -113,6 +112,7 @@ budget. No oracle, no capability. Details, including the conformance checklist, 
 - A subtask is a checklist item in the child issue body. Three levels at most.
 - Record issue numbers beside phases and tasks once they exist.
 - Keep `ROADMAP.md`, `CHANGE_LOG.md`, `notes/`, issue bodies, and PR descriptions in step.
+- A phase ends with a close-out package. See [phase close-out](docs/reference/phase-closeout.rst).
 
 Details: [workflow model](docs/reference/workflow-model.rst) and
 [GitHub mapping](docs/reference/github-mapping.rst).
@@ -120,14 +120,19 @@ Details: [workflow model](docs/reference/workflow-model.rst) and
 ## Approval gates
 
 You may, within the active phase: create and commit to its branch, push that branch, open and update
-its issues and pull requests, and run local checks.
+its issues and pull requests, run local checks, and write notes and reports.
 
-You must ask, and wait for an explicit answer, before you: activate a phase; merge a pull request;
-close a parent issue; create a tag or a release; change visibility, settings, or branch protection;
-create an external account, repository, or server; touch private data or credentials; or delete
-anything.
+A phase ends with a close-out package. Queue the phase's pull request, write its close-out report, and
+recommend the next actions. When the maintainer approves the report, execute what it approves:
+squash-merge the pull request, delete the feature branch, close the parent issue, and launch the next
+phase.
 
-Details: [approval gates](docs/reference/approval-gates.rst).
+You must wait for an explicit approval before you: create a tag or a release; change visibility,
+settings, or branch protection; create an external account, repository, or server; touch private data
+or credentials; or delete anything beyond the branch that an approved report names. Name each of these
+in the report, with its exact command.
+
+Details: [phase close-out](docs/reference/phase-closeout.rst) and [approval gates](docs/reference/approval-gates.rst).
 
 ## GitHub hygiene
 

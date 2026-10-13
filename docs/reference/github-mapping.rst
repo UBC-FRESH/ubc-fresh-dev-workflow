@@ -41,7 +41,9 @@ Pull requests
   status.
 - A pull request for a single task uses the same ``Part of #<parent>`` line. It
   never uses a closing keyword for the parent.
-- The agent opens pull requests. The maintainer reviews and merges them.
+- The agent opens one pull request per phase, and queues it with a close-out report.
+  The maintainer approves the report, and then the agent merges the pull request. See
+  :doc:`phase-closeout`.
 
 Closure
 -------

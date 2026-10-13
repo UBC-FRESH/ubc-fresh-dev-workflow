@@ -96,5 +96,7 @@ Take one task at a time. For each task:
 
 When every task in the phase is complete or deferred, open a pull request from
 the phase branch to ``main``. Its body starts with ``Part of #<parent>`` and
-lists the child issues. The maintainer reviews and merges it. Close the parent
-issue only after the merge.
+lists the child issues. Write the close-out report from the seed's
+``notes/reports/phase-closeout-template.md``, and commit it to the branch. The maintainer
+approves the report. Then the agent merges the pull request, closes the parent issue,
+and deletes the branch. See :doc:`../reference/phase-closeout`.

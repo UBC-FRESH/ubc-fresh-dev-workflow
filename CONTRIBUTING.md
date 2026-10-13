@@ -43,8 +43,9 @@ are no exceptions. See [the green dashboard](docs/agents/green-dashboard.rst).
   it in the same change set.
 - Keep `ROADMAP.md`, `CHANGE_LOG.md`, `notes/`, and the matching GitHub issues in step with the work.
 - Change the docs in the same change set as the behavior they describe.
-- Open pull requests against `main` with `Part of #<parent issue>` in the body. A maintainer merges
-  them, and CI must be green first.
+- Open pull requests against `main` with `Part of #<parent issue>` in the body. A maintainer
+  merges human-authored pull requests, and CI must be green first. An agent-run phase closes out
+  as described in `docs/reference/phase-closeout.rst`.
 
 ## Control characters and public safety
 

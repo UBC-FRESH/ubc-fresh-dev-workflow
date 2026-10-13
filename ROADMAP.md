@@ -30,9 +30,10 @@ Every project built from the seed moves through the same stages. This table show
 
 - A phase is `P<n>`. A task is `P<n>.<m>`. A subtask is a checklist item inside the task's issue body. Three levels at most.
 - Status values are `planned`, `active`, `pr-open`, `complete`, and `deferred`.
-- A phase becomes `active` only after its parent issue exists and the maintainer approves the activation.
+- A phase becomes `active` only after its parent issue exists and the maintainer approves the activation. The approval comes in the close-out of the phase before it, or directly for the first phase.
 - A phase becomes `complete` only after its pull request merges to `main` and its parent issue closes.
 - A child issue closes after its work, checklist, and verification are complete, with a closeout comment.
+- A phase ends with a close-out. The agent queues the pull request, writes the report in `notes/reports/`, and recommends the next actions. After the maintainer approves, the agent merges, closes the parent issue, deletes the branch, and launches the next phase. See `docs/reference/phase-closeout.rst`.
 
 ## Phase 0: Bootstrap scaffold
 
@@ -83,6 +84,7 @@ Goal: make the repository a self-describing seed. The workflow is documented in 
   - [x] Acceptance commands and dashboard recorded in the changelog
   - [x] Child issues closed with closeout comments
   - [x] Pull request opened for maintainer review
+  - [x] Close-out report queued for approval (`notes/reports/p0-closeout.md`)
 
 Acceptance criteria:
 
@@ -146,8 +148,8 @@ Status: planned
 Goal: publish v0.1.0 as a public template, with live docs and an onboarding path for collaborators.
 
 - [ ] P4.1 Release candidate: versions, citation metadata, release notes
-- [ ] P4.2 Pages enablement, live-site check, and template flag (maintainer action)
-- [ ] P4.3 Tag, GitHub release, announcement, and onboarding feedback issue (maintainer action)
+- [ ] P4.2 Pages live-site check and template flag (approval required; Pages is enabled at the P0 close-out)
+- [ ] P4.3 Tag, GitHub release, announcement, and onboarding feedback issue (approval required)
 
 ## Phase 5: Maintenance and feedback loop
 
@@ -163,11 +165,10 @@ Goal: keep the seed current: triage incoming ideas, review it on a cadence, and 
 
 ## Detailed Next Steps Notes
 
-1. Pull request #17 is open, and CI is green on its head commit. The maintainer reviews and merges it. The agent does not merge it.
-2. After the merge: confirm the CI and docs workflows on `main`, enable GitHub Pages from the workflow (maintainer approval), require the CI jobs in branch protection (maintainer approval; see `docs/reference/quality-gates.rst`), and close #1.
-3. Activate P1 only with maintainer approval. Then create its child issues as sub-issues of #9, and create `feature/p1-dogfood-validation` from `main`.
-4. Open questions for the maintainer:
-   - Should the seed also ship GitHub issue forms (YAML) next to the Markdown templates?
-   - Should `new_project.py` create the GitHub repository itself? It does not today, because GitHub mutations need approval. A flag could add that later.
-   - Should the seed carry the same MIT license as the lab's other public repositories? Assumed yes.
-   - Is a 90 percent branch-coverage gate the right starting point? The plan ratchets it to 95 percent in P1.
+1. Phase 0 is queued for approval. Pull request #17 is open, and its CI is green on the evidence head `2cf80b9`. The close-out report is `notes/reports/p0-closeout.md`, and its recommendation lists the actions. After the maintainer approves them, the agent carries them out in this order, and reads back each result: squash-merge #17 and delete its branch, enable GitHub Pages from the Actions source, require the four CI checks on `main`, close #1 with a closeout comment, and launch Phase 1.
+2. Launching Phase 1 means creating `feature/p1-dogfood-validation` from the merged `main`. In its first commit, set P0 to `complete` and P1 to `active` in this file and in the tracker map. Then create the P1 child issues as sub-issues of #9, and start P1.1.
+3. Recommended defaults for the open choices. The report asks for approval of each one, and the maintainer may change it there:
+   - Seed issue forms (YAML) are deferred to the P1 friction log. The default is Markdown templates only, until a dogfood run shows the need.
+   - `scripts/new_project.py` keeps writing local files only. Creating a repository stays a separate approved action.
+   - The seed carries the MIT license, as the lab's other public repositories do.
+   - The 90 percent branch-coverage gate holds in P0. P1 ratchets it to 95 percent.

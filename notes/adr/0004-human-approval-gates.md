@@ -1,6 +1,6 @@
 # ADR 0004: Human approval gates
 
-Status: accepted
+Status: accepted. Refined by ADR 0008 for phase-end merges and closures.
 Date: 2026-10-13
 Issues: #2, #8
 
