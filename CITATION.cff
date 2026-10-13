@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this workflow template, please cite the repository."
+title: "UBC-FRESH Dev Workflow"
+abstract: "A seed and onboarding kit for agent-assisted science and engineering projects: phase, task, and subtask roadmaps mirrored in GitHub issues, agent operating contracts, agent-friendly documentation, and a container-per-project dev server recipe."
+authors:
+  - name: "UBC FRESH Lab"
+repository-code: "https://github.com/UBC-FRESH/ubc-fresh-dev-workflow"
+url: "https://github.com/UBC-FRESH/ubc-fresh-dev-workflow"
+license: "MIT"
