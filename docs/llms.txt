@@ -13,12 +13,16 @@
 - [GitHub mapping](reference/github-mapping.html): parent and child issues, branches, pull requests, and closure.
 - [Issue standard](reference/issue-standard.html): required sections and formatting rules for issue bodies.
 - [Git conventions](reference/git-conventions.html): branch names, commit messages, and pull request titles.
+- [Quality gates](reference/quality-gates.html): the gates that form the green dashboard, and the CI jobs.
+- [Testing policy](reference/testing-policy.html): the layers of tests, and the coverage gate.
+- [Typing and docstrings](reference/typing-and-docstrings.html): the annotation and docstring rules.
 
 ## Agents
 
 - [Bounded moves](agents/bounded-moves.html): what counts as one unit of work, and the scope-breach rule.
 - [Oracles and evidence](agents/oracles-and-evidence.html): evidence standards and the validator's finding codes.
 - [RTFM protocol](agents/rtfm.html): how to read, cite, and fix the docs.
+- [Green dashboard](agents/green-dashboard.html): the rule for any change from full green.
 
 ## Guides
 

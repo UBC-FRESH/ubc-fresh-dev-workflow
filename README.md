@@ -1,5 +1,7 @@
 # UBC-FRESH Dev Workflow
 
+[![CI](https://github.com/UBC-FRESH/ubc-fresh-dev-workflow/actions/workflows/ci.yml/badge.svg)](https://github.com/UBC-FRESH/ubc-fresh-dev-workflow/actions/workflows/ci.yml)
+
 A seed and onboarding kit for agent-assisted science and engineering projects.
 
 It captures how the UBC FRESH Lab plans, builds, reviews, and releases software with coding agents: a phase, task, and subtask roadmap mirrored in GitHub issues; agent operating contracts; agent-friendly documentation; and a container-per-project dev server recipe.
@@ -47,10 +49,8 @@ cd ubc-fresh-dev-workflow
 python -m venv .venv
 . .venv/bin/activate
 python -m pip install -r requirements-dev.txt
-python -m ruff check .
-python -m pytest
-sphinx-build -b html docs _build/html -W
-python scripts/check_workflow.py
+pre-commit install
+python scripts/dashboard.py
 ```
 
 Start a new project from the seed:
@@ -61,9 +61,19 @@ python scripts/new_project.py --name "My Project" --slug my-project --dest ../my
 
 The initializer validates what it produced. Then follow [Starting a new project](docs/guides/first-project.rst) to create the GitHub repository and its Phase 0 parent issue.
 
+## The green dashboard
+
+Every commit leaves the dashboard green. `python scripts/dashboard.py` runs the lint, format, type,
+test, validator, docs, and seed gates, and exits non-zero when any of them is red. Any change from
+green is investigated and fixed immediately. See [the green dashboard](docs/agents/green-dashboard.rst)
+and [quality gates](docs/reference/quality-gates.rst).
+
 ## Status
 
-Phase P0, the bootstrap scaffold, is on the branch `feature/p0-bootstrap-scaffold` and waits for maintainer review. The live status of every phase is in [`ROADMAP.md`](ROADMAP.md) and in the GitHub issues.
+Phase P0, the bootstrap scaffold, is in progress on the branch `feature/p0-bootstrap-scaffold`. It was
+reopened to add the quality gates, the typed API reference, and the embedded capability pattern. It
+waits for maintainer review once its pull request is open. The live status of every phase is in
+[`ROADMAP.md`](ROADMAP.md) and in the GitHub issues.
 
 ## Repository map
 

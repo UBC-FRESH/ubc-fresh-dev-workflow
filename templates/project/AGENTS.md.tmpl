@@ -4,7 +4,9 @@ This file is the working contract for coding agents in {{PROJECT_NAME}}.
 
 {{PROJECT_PURPOSE}}
 
-Keep this file short. Each rule below either checks itself or points to the page that explains it. The workflow rules come from the UBC-FRESH dev workflow, which this project was seeded from. Project-specific rules go at the end, each with its reason.
+Keep this file short. Each rule below either checks itself or points to the page that explains it.
+The workflow rules come from the UBC-FRESH dev workflow, which this project was seeded from. Project-
+specific rules go at the end, each with its reason.
 
 ## Session start
 
@@ -27,7 +29,39 @@ Cite the pages you relied on in your report.
 - **Structured handoff.** Issues, the roadmap, notes, and the changelog carry the state.
 - **Preserve uncertainty.** Say what you did not verify, and why.
 - **Scope discipline.** Stay inside the active phase and task.
-- **Sanitized output.** Keep private data, credentials, raw transcripts, and personal paths out of tracked files.
+- **Sanitized output.** Keep private data, credentials, raw transcripts, and personal paths out of
+  tracked files.
+
+## The green dashboard rule
+
+`python scripts/dashboard.py` runs every quality gate: lint, format, strict types, tests with a coverage
+gate, the workflow validator, and the docs build with warnings as errors.
+
+- Every commit leaves the dashboard green.
+- Any change from green is investigated and fixed immediately. There are no exceptions.
+- A failure you did not cause is still yours to fix, or to report with evidence before you continue.
+- Do not weaken a gate to make it pass. A gate changes only with a changelog entry that explains why.
+- Record the dashboard result in the changelog entry for each task that you close.
+
+## Typing and docstrings
+
+- Every function, method, and test has complete type annotations. `mypy --strict` must pass.
+- Every public function has a numpy-style docstring. Its parameters and return value match its annotations.
+- Do not use `Any`, `# type: ignore`, or `cast` without a comment that says why. A suppression names its error code.
+
+## Testing policy
+
+- Every function you write or change gets unit tests in the same change set. Tests must be able to
+  fail, and each one asserts a specific behavior.
+- Keep the layers: unit tests for each function, contract tests for public interfaces, integration
+  tests for the command-line tools, property tests for invariants, and the self-check.
+- The coverage gate is 90 percent branch coverage of `scripts/`. Aim near 100 percent, with tests that
+  assert something.
+
+## CI and merges
+
+- CI runs every gate on every pull request, and on every push to `main`.
+- No pull request merges while CI is red. The agent does not merge; the maintainer does.
 
 ## Planning workflow
 
@@ -38,9 +72,13 @@ Cite the pages you relied on in your report.
 
 ## Approval gates
 
-You may, within the active phase: create and commit to its branch, push that branch, open and update its issues and pull requests, and run local checks.
+You may, within the active phase: create and commit to its branch, push that branch, open and update
+its issues and pull requests, and run local checks.
 
-You must ask, and wait for an explicit answer, before you: activate a phase; merge a pull request; close a parent issue; create a tag or a release; change repository visibility or settings; create an external account, repository, or server; touch private data or credentials; or delete anything.
+You must ask, and wait for an explicit answer, before you: activate a phase; merge a pull request;
+close a parent issue; create a tag or a release; change repository visibility, settings, or branch
+protection; create an external account, repository, or server; touch private data or credentials; or
+delete anything.
 
 ## GitHub hygiene
 
@@ -58,20 +96,18 @@ You must ask, and wait for an explicit answer, before you: activate a phase; mer
 
 ## Verification
 
-Run these before you report a change as done:
+Run the dashboard before you report a change as done:
 
 ```bash
-python -m ruff check .
-python -m pytest
-sphinx-build -b html docs _build/html -W
-python scripts/check_workflow.py
+python scripts/dashboard.py
 ```
 
-Record the commands and their results in the changelog entry for the milestone.
+Record the result in the changelog entry for the milestone.
 
 ## Public safety
 
-- No private data, credentials, raw transcripts, unpublished documents, or machine-specific paths in tracked files.
+- No private data, credentials, raw transcripts, unpublished documents, or machine-specific paths in
+  tracked files.
 - Use placeholders, repository-relative paths, or environment variables in examples.
 
 ## Project-specific rules

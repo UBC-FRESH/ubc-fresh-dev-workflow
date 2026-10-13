@@ -11,3 +11,4 @@ reads them too, because they define what the agent may do.
    bounded-moves
    oracles-and-evidence
    rtfm
+   green-dashboard

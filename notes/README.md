@@ -23,4 +23,6 @@ Notes are the persistent, agent-friendly context for this project. They hold wha
 - [ADR 0002: docs as the source of truth](adr/0002-docs-as-source-of-truth.md)
 - [ADR 0003: one container per project on a lab dev server](adr/0003-container-per-project-dev-server.md)
 - [ADR 0004: human approval gates](adr/0004-human-approval-gates.md)
+- [ADR 0005: strict typing and numpy docstrings](adr/0005-strict-typing-and-docstrings.md)
+- [ADR 0006: the green dashboard rule](adr/0006-green-dashboard-rule.md)
 - [Pattern survey](reference/pattern-survey.md): a sanitized survey of public UBC-FRESH repositories

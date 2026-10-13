@@ -63,15 +63,15 @@ Goal: make the repository a self-describing seed. The workflow is documented in 
   - [x] pytest suite and CI workflow
 - [x] P0.6 FRESH-style dev server guide (#7)
   - [x] Host and containers, IDE and agents, and security and verification pages
-- [ ] P0.7 Quality gates, strict typing, coverage, and the green dashboard (#14)
-  - [ ] Gate configuration in pyproject.toml, requirements-dev.txt, and .pre-commit-config.yaml
-  - [ ] Full annotations in scripts/ and tests/, passing mypy --strict
-  - [ ] Numpy-style docstrings, and a numpydoc validation test
-  - [ ] Hypothesis property tests for the roadmap grammar, and subprocess integration tests
-  - [ ] scripts/dashboard.py with typed pure functions, and an integration test per exit path
-  - [ ] CI quality matrix, dashboard summary job, and pre-commit parity job
-  - [ ] Policy pages, ADRs 0005 and 0006, AGENTS.md, CONTRIBUTING.md, and README badges
-  - [ ] Dashboard result recorded in the changelog
+- [x] P0.7 Quality gates, strict typing, coverage, and the green dashboard (#14)
+  - [x] Gate configuration in pyproject.toml, requirements-dev.txt, and .pre-commit-config.yaml
+  - [x] Full annotations in scripts/ and tests/, passing mypy --strict
+  - [x] Numpy-style docstrings for the framework scripts (the numpydoc validation test is P0.8)
+  - [x] Hypothesis property tests for the roadmap grammar, and subprocess integration tests
+  - [x] scripts/dashboard.py with typed pure functions, and an integration test per exit path
+  - [x] CI quality matrix, dashboard summary job, and pre-commit parity job
+  - [x] Policy pages, ADRs 0005 and 0006, AGENTS.md, CONTRIBUTING.md, and README badges
+  - [x] Dashboard result recorded in the changelog
 - [ ] P0.8 Typed API reference and docstring validation (#15)
   - [ ] Numpy-style docstrings for every public function in scripts/
   - [ ] tests/test_api_docstrings.py
@@ -163,7 +163,7 @@ Goal: keep the seed current: triage incoming ideas, review it on a cadence, and 
 
 ## Detailed Next Steps Notes
 
-1. P0 is reopened. Work in this order: P0.7 (gates), then P0.8 (typed API docs), then P0.9 (embedded capability docs). Each one lands as its own commit, and each commit passes the full dashboard before the next one starts.
+1. P0.7 is complete on the branch, and the full dashboard is green. Next comes P0.8 (the typed API reference and the numpydoc test), then P0.9 (the embedded capability pattern). Each one lands as its own commit, and each commit passes the full dashboard before the next one starts.
 2. P0.10 closes the phase. It opens the pull request, which is the review artifact. The agent does not merge it.
 3. After the maintainer merges P0: confirm the CI and docs workflows on `main`, enable GitHub Pages from the workflow (maintainer approval), require the CI checks in branch protection (maintainer approval; see `docs/reference/quality-gates.rst`), and close #1.
 4. Activate P1 only with maintainer approval. Then create its child issues as sub-issues of #9, and create `feature/p1-dogfood-validation` from `main`.

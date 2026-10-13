@@ -13,3 +13,6 @@ and the agent pages.
    issue-standard
    git-conventions
    approval-gates
+   quality-gates
+   testing-policy
+   typing-and-docstrings
