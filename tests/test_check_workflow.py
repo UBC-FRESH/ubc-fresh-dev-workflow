@@ -635,3 +635,159 @@ def test_walked_trees_skip_generated_caches(tmp_path: Path) -> None:
     write(root, ".hypothesis/constants/cache", f"Runner path {HOME_PREFIX}runner/work\n")
     write(root, "runtime/dashboard.md", f"Runner path {HOME_PREFIX}runner/work\n")
     assert error_codes(root) == set()
+
+
+GITIGNORE_FORMS: str = """# Comments and blank lines are not rules.
+
+__pycache__/
+*.py[cod]
+.venv/
+_build/
+docs/_build/
+data/private/
+tmp/
+runtime/
+.DS_Store
+Thumbs.db
+.coverage
+.coverage.*
+coverage.xml
+.hypothesis/
+"""
+
+
+def test_walk_mode_skips_ignored_files_even_when_they_are_utf8_text(tmp_path: Path) -> None:
+    """A file that the root .gitignore ignores is not scanned, even though it is valid UTF-8."""
+    root = make_repo(tmp_path)
+    write(root, ".gitignore", "local-notes.log\n")
+    write(root, "local-notes.log", f"Clone into {HOME_PREFIX}someone/projects\n")
+    assert "PATH-PERSONAL" not in error_codes(root)
+
+
+def test_walk_mode_still_scans_files_the_gitignore_does_not_ignore(tmp_path: Path) -> None:
+    """A file that the root .gitignore does not match is still scanned."""
+    root = make_repo(tmp_path)
+    write(root, ".gitignore", "local-notes.log\n")
+    write(root, "notes/open.log", f"Clone into {HOME_PREFIX}someone/projects\n")
+    assert "PATH-PERSONAL" in error_codes(root)
+
+
+def test_walk_mode_prunes_ignored_directories_and_generated_ones(tmp_path: Path) -> None:
+    """Ignored directories are not walked, and neither are the generated ones in SKIP_DIRS."""
+    root = make_repo(tmp_path)
+    write(root, ".gitignore", "cache/\n")
+    write(root, "cache/leak.md", f"Clone into {HOME_PREFIX}someone/projects\n")
+    write(root, ".venv/lib/leak.md", f"Clone into {HOME_PREFIX}someone/projects\n")
+    assert "PATH-PERSONAL" not in error_codes(root)
+
+
+def test_a_trailing_slash_rule_leaves_a_same_named_file_scanned(tmp_path: Path) -> None:
+    """A trailing-slash rule applies to directories, so a file with the same name is scanned."""
+    root = make_repo(tmp_path)
+    write(root, ".gitignore", "cache/\n")
+    write(root, "docs/cache", f"Clone into {HOME_PREFIX}someone/projects\n")
+    assert "PATH-PERSONAL" in error_codes(root)
+
+
+def test_an_anchored_rule_matches_only_at_the_root(tmp_path: Path) -> None:
+    """A rule with a leading slash applies at the root only, so a nested file is still scanned."""
+    root = make_repo(tmp_path)
+    write(root, ".gitignore", "/notes.md\n")
+    write(root, "notes.md", f"Clone into {HOME_PREFIX}someone/projects\n")
+    write(root, "docs/notes.md", f"Clone into {HOME_PREFIX}someone/projects\n")
+    flagged = [diag.path for diag in cw.run(root) if diag.code == "PATH-PERSONAL"]
+    assert flagged == ["docs/notes.md"]
+
+
+def test_a_later_negation_re_includes_a_file(tmp_path: Path) -> None:
+    """A later ! rule re-includes a file that an earlier rule ignores."""
+    root = make_repo(tmp_path)
+    write(root, ".gitignore", "*.log\n!keep.log\n")
+    write(root, "keep.log", f"Clone into {HOME_PREFIX}someone/projects\n")
+    write(root, "drop.log", f"Clone into {HOME_PREFIX}someone/projects\n")
+    flagged = [diag.path for diag in cw.run(root) if diag.code == "PATH-PERSONAL"]
+    assert flagged == ["keep.log"]
+
+
+def test_a_negation_cannot_reinclude_a_file_in_an_ignored_directory(tmp_path: Path) -> None:
+    """Git does not re-include a file whose directory is ignored, and the walk follows that."""
+    root = make_repo(tmp_path)
+    write(root, ".gitignore", "build/\n!build/keep.md\n")
+    write(root, "build/keep.md", f"Clone into {HOME_PREFIX}someone/projects\n")
+    assert "PATH-PERSONAL" not in error_codes(root)
+
+
+def test_only_the_root_gitignore_is_read(tmp_path: Path) -> None:
+    """A .gitignore in a subdirectory is not read, so its rules do not apply."""
+    root = make_repo(tmp_path)
+    write(root, "docs/.gitignore", "private.md\n")
+    write(root, "docs/private.md", f"Clone into {HOME_PREFIX}someone/projects\n")
+    assert "PATH-PERSONAL" in error_codes(root)
+
+
+def test_a_root_without_a_gitignore_has_no_rules(tmp_path: Path) -> None:
+    """A root with no .gitignore has no rules."""
+    assert cw.load_ignore_rules(tmp_path) == []
+
+
+def test_gitignore_forms_used_by_this_repository_are_applied(tmp_path: Path) -> None:
+    """Each form in the repository's ignore file matches the paths it should, and no others."""
+    write(tmp_path, ".gitignore", GITIGNORE_FORMS)
+    rules = cw.load_ignore_rules(tmp_path)
+    cases: list[tuple[str, bool, bool]] = [
+        ("pkg/__pycache__/mod.py", False, True),
+        ("pkg/mod.pyc", False, True),
+        ("pkg/mod.py", False, False),
+        ("docs/_build/index.html", False, True),
+        ("other/_build/index.html", False, True),
+        ("data/private/row.csv", False, True),
+        ("data/public/row.csv", False, False),
+        (".venv/bin/python", False, True),
+        ("tmp", True, True),
+        ("notes/tmp.md", False, False),
+        ("runtime", True, True),
+        ("runtime", False, False),
+        ("docs/Thumbs.db", False, True),
+        (".DS_Store", False, True),
+        (".coverage.worker", False, True),
+        ("coverage.xml", False, True),
+        ("docs/index.rst", False, False),
+        ("scripts/check_workflow.py", False, False),
+    ]
+    for rel, is_dir, expected in cases:
+        assert cw.is_ignored(rel, is_dir=is_dir, rules=rules) is expected, rel
+
+
+def test_character_classes_and_single_character_wildcards(tmp_path: Path) -> None:
+    """A ! class negates, ? matches one character, and an unclosed bracket is literal."""
+    write(tmp_path, ".gitignore", "file[!0-9].txt\nnote?.md\ndocs/*.rst\nbad[name\nx[]\n")
+    rules = cw.load_ignore_rules(tmp_path)
+    assert cw.is_ignored("fileX.txt", is_dir=False, rules=rules)
+    assert not cw.is_ignored("file1.txt", is_dir=False, rules=rules)
+    assert cw.is_ignored("note1.md", is_dir=False, rules=rules)
+    assert not cw.is_ignored("note12.md", is_dir=False, rules=rules)
+    assert cw.is_ignored("docs/index.rst", is_dir=False, rules=rules)
+    assert not cw.is_ignored("docs/sub/index.rst", is_dir=False, rules=rules)
+    assert cw.is_ignored("bad[name", is_dir=False, rules=rules)
+    assert cw.is_ignored("x[]", is_dir=False, rules=rules)
+
+
+def test_lines_the_reader_cannot_apply_are_skipped(tmp_path: Path) -> None:
+    """Escapes, ** patterns, bare slashes, bad classes, comments, and blank lines give no rule."""
+    write(tmp_path, ".gitignore", "**/cache.md\n\\#literal\n/\n[z-a]\n# a comment\n\n")
+    assert cw.load_ignore_rules(tmp_path) == []
+
+
+def test_the_last_matching_rule_decides(tmp_path: Path) -> None:
+    """The last matching rule decides, so a rule after a negation can ignore a file again."""
+    write(tmp_path, ".gitignore", "*.log\n!keep.log\n*.log\n")
+    rules = cw.load_ignore_rules(tmp_path)
+    assert cw.is_ignored("keep.log", is_dir=False, rules=rules)
+
+
+def test_a_path_under_an_ignored_directory_is_ignored(tmp_path: Path) -> None:
+    """A path under an ignored directory stays ignored, even when a later rule names it."""
+    write(tmp_path, ".gitignore", "build/\n!build/keep.md\n")
+    rules = cw.load_ignore_rules(tmp_path)
+    assert cw.is_ignored("build/keep.md", is_dir=False, rules=rules)
+    assert not cw.is_ignored("keep.md", is_dir=False, rules=rules)

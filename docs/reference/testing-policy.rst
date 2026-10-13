@@ -43,7 +43,8 @@ Rules
 - Each test asserts a specific behavior. A test that only checks that nothing raised is not
   enough. The test name and its docstring say which behavior it checks.
 - Build bad fixtures at runtime, so that test files do not contain the patterns they check
-  for. The validator scans tracked files, and a fixture must not trip the check it tests.
+  for. The validator scans the files that a commit would include, and a fixture must not
+  trip the check it tests.
 - Test the failure paths as carefully as the success paths. The branches that report
   problems are the ones that people rely on.
 - Use hypothesis when the input space is large and the property is clear. Keep examples

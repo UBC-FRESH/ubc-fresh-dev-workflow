@@ -76,7 +76,7 @@ This log records what the first dogfood runs found: the synthetic demo project, 
 | --- | --- | --- |
 | V1. The existence of the parent issue is not checked. | F2 | accepted |
 | V2. The seed's placeholder text is not flagged. | F3 | deferred, #24 |
-| V3. Walk mode does not read the root `.gitignore`. An ignored binary file is skipped only because it is not UTF-8. | Known risk from the P0 close-out | deferred to P1.4, #21 |
+| V3. Walk mode does not read the root `.gitignore`. An ignored binary file is skipped only because it is not UTF-8. | Known risk from the P0 close-out | fixed in P1.4, #21 |
 
 ## Open items
 

@@ -68,17 +68,23 @@ finding carries a stable code, listed here:
    * - ``LLMS-BROKEN``
      - A link in ``docs/llms.txt`` has no matching page.
    * - ``CONTROL-CHAR``
-     - A control character, or a carriage return, is in a tracked file.
+     - A control character, or a carriage return, is in a scanned file.
    * - ``BOM``
-     - A byte-order mark (U+FEFF) is in a tracked file.
+     - A byte-order mark (U+FEFF) is in a scanned file.
    * - ``PATH-PERSONAL``
-     - A personal home-directory path is in a tracked file.
+     - A personal home-directory path is in a scanned file.
    * - ``SECRET-SHAPED``
      - A string has the shape of a credential.
    * - ``ENCODING``
      - A file passed with ``--files`` is not valid UTF-8.
    * - ``PLACEHOLDER-LEFT``
      - Reported by ``new_project.py``: a placeholder survived rendering.
+
+The validator scans the files that a commit would include. When the root is the top level of a
+git repository, these are the tracked files and the untracked files that git does not ignore.
+Otherwise, as in a generated project inside another repository, the validator walks the tree and
+skips the paths that the root ``.gitignore`` ignores. Only the root ``.gitignore`` is read. A line
+that the reader cannot apply is skipped, so the files that line would match are scanned.
 
 ``FILE-RECOMMENDED`` is the one warning. It names recommended files that are
 missing, such as a license. Warnings do not fail the run.
