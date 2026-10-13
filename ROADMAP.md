@@ -110,7 +110,7 @@ Status: active
 Goal: prove the seed works end to end on a throwaway project. Run the loop once, record every failure, and fix or file each one.
 
 - [x] P1.1 Generate and exercise the synthetic demo project (#18)
-- [ ] P1.2 Fresh-clone rehearsal of this repository's checks (#19)
+- [x] P1.2 Fresh-clone rehearsal of this repository's checks (#19)
 - [ ] P1.3 Friction log, fixes, and validator gap list (#20)
 - [ ] P1.4 Walk mode honors the root `.gitignore`, with a test (#21)
 - [ ] P1.5 Coverage gate ratchet to 95 percent (#22)
@@ -184,7 +184,7 @@ Goal: keep the seed current: triage incoming ideas, review it on a cadence, and 
 ## Detailed Next Steps Notes
 
 1. Phase 0 is complete. Pull request #17 merged as `2943d83`, GitHub Pages is live, branch protection requires the four CI checks on `main`, and #1 is closed.
-2. Phase 1 is active. Its child tasks are #18 to #23, under the parent #9. P1.1 is complete: its record is on #18, and its six findings are on #20. P1.2, the fresh-clone rehearsal (#19), is next.
+2. Phase 1 is active. Its child tasks are #18 to #23, under the parent #9. P1.1 and P1.2 are complete. Their records are on #18 and #19, and their findings are on #20, which now lists seven. P1.3, the friction log and its fixes (#20), is next.
 3. Phase 1 closes with its own close-out report, `notes/reports/p1-closeout.md`, queued in a pull request. The maintainer approves the report. Then the agent squash-merges the pull request, closes #9, and deletes the branch.
 4. Recommended defaults, as approved with the Phase 0 close-out. The Phase 1 report can change them:
    - Seed issue forms (YAML) stay deferred. The default is Markdown templates, until the friction log shows the need.
