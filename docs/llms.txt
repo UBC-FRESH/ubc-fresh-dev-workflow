@@ -23,6 +23,7 @@
 - [Oracles and evidence](agents/oracles-and-evidence.html): evidence standards and the validator's finding codes.
 - [RTFM protocol](agents/rtfm.html): how to read, cite, and fix the docs.
 - [Green dashboard](agents/green-dashboard.html): the rule for any change from full green.
+- [Embedded capabilities](agents/embedded-capabilities.html): the contract for validated, advisory capabilities, with a conformance checklist.
 
 ## API
 

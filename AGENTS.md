@@ -92,6 +92,13 @@ Details: [typing and docstrings](docs/reference/typing-and-docstrings.rst).
 
 Details: [testing policy](docs/reference/testing-policy.rst).
 
+## Embedded agent capabilities
+
+Projects that ship complicated scientific software may offer agents validated capabilities instead of
+documentation alone. A capability is a prompt, a validator over real state, and a bounded retry
+budget. No oracle, no capability. Details, including the conformance checklist, are in
+[embedded capabilities](docs/agents/embedded-capabilities.rst). The page is experimental.
+
 ## CI and merges
 
 - CI runs every gate on every pull request, and on every push to `main`.

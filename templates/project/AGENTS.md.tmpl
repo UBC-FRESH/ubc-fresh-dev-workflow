@@ -58,6 +58,13 @@ gate, the workflow validator, and the docs build with warnings as errors.
 - The coverage gate is 90 percent branch coverage of `scripts/`. Aim near 100 percent, with tests that
   assert something.
 
+## Embedded agent capabilities
+
+If this project ships complicated software, it may offer agents validated capabilities instead of
+documentation alone. A capability is a prompt, a validator over real state, and a bounded retry
+budget. No oracle, no capability. Each capability needs offline tests with a fake provider, and it
+must say what its validator checks and what it does not.
+
 ## CI and merges
 
 - CI runs every gate on every pull request, and on every push to `main`.

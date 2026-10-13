@@ -25,4 +25,5 @@ Notes are the persistent, agent-friendly context for this project. They hold wha
 - [ADR 0004: human approval gates](adr/0004-human-approval-gates.md)
 - [ADR 0005: strict typing and numpy docstrings](adr/0005-strict-typing-and-docstrings.md)
 - [ADR 0006: the green dashboard rule](adr/0006-green-dashboard-rule.md)
+- [ADR 0007: embedded agent capabilities, validated and advisory](adr/0007-embedded-capabilities-pattern.md)
 - [Pattern survey](reference/pattern-survey.md): a sanitized survey of public UBC-FRESH repositories

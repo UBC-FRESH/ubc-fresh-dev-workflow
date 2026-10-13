@@ -12,3 +12,4 @@ reads them too, because they define what the agent may do.
    oracles-and-evidence
    rtfm
    green-dashboard
+   embedded-capabilities
