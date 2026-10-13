@@ -39,6 +39,7 @@ SHARED_FRAMEWORK_FILES: tuple[str, ...] = (
     "scripts/check_workflow.py",
     "scripts/dashboard.py",
     "tests/conftest.py",
+    "tests/test_api_docstrings.py",
     "tests/test_check_workflow.py",
     "tests/test_cli.py",
     "tests/test_dashboard.py",
@@ -46,6 +47,8 @@ SHARED_FRAMEWORK_FILES: tuple[str, ...] = (
     "pyproject.toml",
     "requirements-dev.txt",
     ".pre-commit-config.yaml",
+    "docs/api/check-workflow.rst",
+    "docs/api/dashboard.rst",
 )
 NEXT_STEPS: str = """
 Next steps. The GitHub steps need maintainer approval first.

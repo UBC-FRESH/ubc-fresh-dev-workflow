@@ -24,6 +24,13 @@
 - [RTFM protocol](agents/rtfm.html): how to read, cite, and fix the docs.
 - [Green dashboard](agents/green-dashboard.html): the rule for any change from full green.
 
+## API
+
+- [API reference](api/index.html): every public function, with its parameters, types, and return values.
+- [check_workflow](api/check-workflow.html): the validator, and the finding codes it reports.
+- [dashboard](api/dashboard.html): the green dashboard, its gates, and its exit status.
+- [new_project](api/new-project.html): the initializer that renders the seed.
+
 ## Guides
 
 - [Onboarding](guides/onboarding.html): a guided tour for new people.

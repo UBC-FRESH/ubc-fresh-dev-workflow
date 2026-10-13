@@ -27,6 +27,12 @@ before you change anything.
 
    agents/index
 
+.. toctree::
+   :maxdepth: 2
+   :caption: API
+
+   api/index
+
 RTFM map
 --------
 
