@@ -14,6 +14,7 @@ and the agent pages.
    git-conventions
    approval-gates
    phase-closeout
+   lifecycle
    quality-gates
    testing-policy
    typing-and-docstrings

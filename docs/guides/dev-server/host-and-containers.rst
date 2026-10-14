@@ -31,7 +31,7 @@ in new login sessions. ``newgrp`` applies it to the current shell:
 
 .. code-block:: bash
 
-   sudo snap install lxd
+   sudo snap install lxd --channel=latest/stable
    sudo usermod -aG lxd "$USER"
    newgrp lxd
 

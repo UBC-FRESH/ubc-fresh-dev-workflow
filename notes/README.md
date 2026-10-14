@@ -28,6 +28,7 @@ Notes are the persistent, agent-friendly context for this project. They hold wha
 - [ADR 0006: the green dashboard rule](adr/0006-green-dashboard-rule.md)
 - [ADR 0007: embedded agent capabilities, validated and advisory](adr/0007-embedded-capabilities-pattern.md)
 - [ADR 0008: phase close-out, with approval before execution](adr/0008-phase-closeout-and-execution.md)
+- [ADR 0009: Phase 0 is local, and repository creation is an activation step](adr/0009-phase-0-local-repository-at-activation.md)
 - [Pattern survey](reference/pattern-survey.md): a sanitized survey of public UBC-FRESH repositories
 - [P0 close-out report](reports/p0-closeout.md): the evidence and the approval request for Phase 0
 - [Dogfood log, Phase 1](reference/dogfood-log.md): the friction found by the first dogfood runs, with a disposition for each entry
