@@ -13,6 +13,7 @@
 
 - [GitHub mapping](reference/github-mapping.html): parent and child issues, branches, pull requests, and closure.
 - [Issue standard](reference/issue-standard.html): required sections and formatting rules for issue bodies.
+- [Lifecycle stages and gates](reference/lifecycle.html): the six stages, their entry and exit criteria, and the owner of each gate.
 - [Git conventions](reference/git-conventions.html): branch names, commit messages, and pull request titles.
 - [Quality gates](reference/quality-gates.html): the gates that form the green dashboard, and the CI jobs.
 - [Testing policy](reference/testing-policy.html): the layers of tests, and the coverage gate.

@@ -15,16 +15,16 @@ This roadmap is the plan of record and the issue tracker map for this repository
 
 ## Lifecycle Map
 
-Every project built from the seed moves through the same stages. This table shows where the repository's own phases sit in that lifecycle.
+Every project built from the seed moves through the same stages. The gate of each stage is defined in `docs/reference/lifecycle.rst`. This table shows where the repository's own phases sit in that lifecycle.
 
-| Stage | Exit criteria | Phases |
-| --- | --- | --- |
-| Scope and design | Goal, scope, and out-of-scope items recorded; decisions in ADRs | P0 |
-| Build | Tasks committed to the phase branch with task IDs; docs updated in the same change set | P0, P2 |
-| Verify | Ruff, pytest, the docs build, and the validator pass; dogfood evidence recorded | P0, P1 |
-| Release and deploy | Tag, release notes, Pages live, and a generated project verified from the template | P3, P4 |
-| Operate and maintain | Review cadence held; incoming ideas triaged | P5 |
-| Retire | Archive notice, final changelog entry, and issues closed | P5 (procedure) |
+| Stage | Phases |
+| --- | --- |
+| Scope and design | P0 |
+| Build | P0, P2 |
+| Verify | P0, P1 |
+| Release and deploy | P3, P4 |
+| Operate and maintain | P5 |
+| Retire | P5 (procedure) |
 
 ## Conventions
 
