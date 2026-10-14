@@ -1,6 +1,6 @@
 # ADR 0009: Phase 0 is local, and repository creation is an activation step
 
-Status: proposed. The maintainer has not decided. The seed's templates and guide do not change until this ADR is accepted.
+Status: accepted on 2026-10-14. The maintainer chose Option A.
 Date: 2026-10-14
 Issues: #25 (F4), #34 (P3.1)
 Related: ADR 0004, ADR 0008
@@ -23,7 +23,7 @@ Option A. P0.1 repeats an activation step, and removing it lets Phase 0 finish o
 
 ## Decision
 
-Pending. The maintainer chooses A, B, or C, or names another option. Record the choice here, and set the status to accepted only then.
+Option A, accepted by the maintainer on 2026-10-14. Phase 0 keeps only local tasks. Repository creation, the first push, and the Phase 0 parent issue are activation steps, and each one needs maintainer approval.
 
 ## Consequences of Option A
 
