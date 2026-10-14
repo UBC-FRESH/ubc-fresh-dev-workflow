@@ -210,7 +210,7 @@ Goal: keep the seed current: triage incoming ideas, review it on a cadence, and 
    - The coverage gate is 90 percent through P0. P1.5 raised it to 95 percent.
 5. Decisions recorded at the Phase 1 close-out, approved on 2026-10-14:
    - F3, #24: the validator's placeholder check stays deferred, and the P5.2 quarterly review considers it.
-   - F4, #25: its ADR is written under P3.1, the lifecycle stage gates.
+   - F4, #25: its ADR is drafted under P3.1, as `notes/adr/0009-phase-0-local-repository-at-activation.md`. The maintainer's decision is pending, and no seed template changes until then.
    - F7, #26: the dev-tool pins are decided with P5.3, the seed versioning and migration policy.
    - F9, #27: the acceptance criteria for the seed's roadmap template fold into P3.1.
    - CI runner: done in P2.4, on the phase branch, before the phase pull request opens. That pull request's CI runs on the pinned runner, so no separate pull request is needed.
