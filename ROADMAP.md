@@ -9,8 +9,8 @@ This roadmap is the plan of record and the issue tracker map for this repository
 | P0 Bootstrap scaffold | #1 | `feature/p0-bootstrap-scaffold` | complete |
 | P1 Dogfood and validation | #9 | `feature/p1-dogfood-validation` | complete |
 | P2 Dev server kit | #10 | `feature/p2-dev-server-kit` | complete |
-| P3 Lifecycle playbooks and deployment | #11 | `feature/p3-lifecycle-playbooks` | active |
-| P4 v0.1.0 public release and onboarding | #12 | `feature/p4-v0.1.0-release` | planned |
+| P3 Lifecycle playbooks and deployment | #11 | `feature/p3-lifecycle-playbooks` | complete |
+| P4 v0.1.0 public release and onboarding | #12 | `feature/p4-v0.1.0-release` | pr-open |
 | P5 Maintenance and feedback loop | #13 | `feature/p5-maintenance-loop` | planned |
 
 ## Lifecycle Map
@@ -155,7 +155,7 @@ Acceptance criteria, as approved at the Phase 1 close-out on 2026-10-14:
 
 Parent issue: #11
 Branch: `feature/p3-lifecycle-playbooks`
-Status: active
+Status: complete
 
 Goal: give each lifecycle stage an exit gate, and write the release, data-management, and agent-roles playbooks.
 
@@ -178,13 +178,19 @@ Phase 3 verification:
 
 Parent issue: #12
 Branch: `feature/p4-v0.1.0-release`
-Status: planned
+Status: pr-open
 
 Goal: publish v0.1.0 as a public template, with live docs and an onboarding path for collaborators.
 
-- [ ] P4.1 Release candidate: versions, citation metadata, release notes
-- [ ] P4.2 Pages live-site check and template flag (approval required; Pages is enabled at the P0 close-out)
-- [ ] P4.3 Tag, GitHub release, announcement, and onboarding feedback issue (approval required)
+- [x] P4.1 Release candidate: versions, citation metadata, release notes (#39)
+- [ ] P4.2 Pages live-site check and template flag (approval required; Pages is enabled at the P0 close-out) (#40)
+- [ ] P4.3 Tag, GitHub release, announcement, and onboarding feedback issue (approval required) (#41)
+
+Acceptance criteria, as approved at the Phase 3 close-out on 2026-10-14:
+
+- The live site builds from the tagged commit, and `llms.txt` is reachable.
+- A project generated from the template repository passes the validator.
+- Release notes list the changes and the known gaps.
 
 ## Phase 5: Maintenance and feedback loop
 
@@ -214,7 +220,7 @@ Goal: keep the seed current: triage incoming ideas, review it on a cadence, and 
    - F7, #26: the dev-tool pins are decided with P5.3, the seed versioning and migration policy.
    - F9, #27: the acceptance criteria for the seed's roadmap template fold into P3.1.
    - CI runner: done in P2.4, on the phase branch, before the phase pull request opens. That pull request's CI runs on the pinned runner, so no separate pull request is needed.
-6. Phase 3 is active. Its parent is #11, and it was launched from `f998cd8` on `feature/p3-lifecycle-playbooks`. Its child tasks are P3.1 to P3.4, on #34 to #37, linked as sub-issues of #11. P3.1 to P3.4 are complete. The Phase 3 close-out is queued in PR #38, and it waits for the maintainer's approval.
+6. Phase 3 is complete. Its parent is #11, and pull request #38 merged it as `fa94b69` into `main`. Its child tasks were P3.1 to P3.4, on #34 to #37, and all four are closed.
 7. Decisions recorded at the Phase 2 close-out, approved on 2026-10-14:
    - Lifecycle stages: the six stages named in #11. The maintainer owns every gate, and the agent prepares the evidence.
    - Tags, releases, and Pages: none in Phase 3. The release playbook names their commands, and each one waits for its own approval.
@@ -222,3 +228,10 @@ Goal: keep the seed current: triage incoming ideas, review it on a cadence, and 
    - Data management: private vaults, DataLad and git-annex, and sanitized artifacts. Raw transcripts stay local.
    - Model routing: model choices are configuration. Each one is recorded with its evidence, and each one is re-checked at the P5.2 review.
    - Snap channel: the dev server guide names `latest/stable`, the channel that `server/host-check.sh` expects.
+8. Phase 4 is queued for approval (`pr-open`), with the close-out report in `notes/reports/p4-closeout.md`. Its parent is #12, and it was launched from `fa94b69` on `feature/p4-v0.1.0-release`. Its child tasks are P4.1 to P4.3, on #39 to #41, linked as sub-issues of #12. P4.1 is complete: the release candidate notes are in `notes/releases/v0.1.0.md`, and `CITATION.cff` names version 0.1.0. P4.2 and P4.3 need approval.
+9. Decisions recorded at the Phase 3 close-out, approved on 2026-10-14:
+   - The seed does not ship the lifecycle, release, data, or roles pages in v0.1.0. They stay in this repository's docs, and P5.3 can revisit it.
+   - The release notes go in `notes/releases/v0.1.0.md`, and the release command names that file.
+   - P4.1 adds `version` and `date-released` to `CITATION.cff`. The DOI is added only after Zenodo is connected, which is an approval-only account action.
+   - The template flag is set after the tag and the Pages check pass, as an approved settings change.
+   - The announcement is drafted in P4.3, and it is posted only after the maintainer approves it.

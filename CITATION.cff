@@ -7,3 +7,5 @@ authors:
 repository-code: "https://github.com/UBC-FRESH/ubc-fresh-dev-workflow"
 url: "https://github.com/UBC-FRESH/ubc-fresh-dev-workflow"
 license: "MIT"
+version: "0.1.0"
+date-released: "2026-10-14"
