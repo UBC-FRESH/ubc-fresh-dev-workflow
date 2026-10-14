@@ -15,9 +15,10 @@ Versions
 - The policy for what each number means is written by P5.3, the seed versioning and
   migration policy. Until that policy is accepted, the maintainer names the version in the
   approval.
-- The version must match in two places: the ``version`` and ``date-released`` fields of
-  ``CITATION.cff``, and the package metadata of a project that is a package. Both name the
-  tag.
+- The version must match the tag wherever it appears. If the project has a ``CITATION.cff``,
+  its ``version`` and ``date-released`` fields name the release. For a project that is a
+  package, its package metadata names the release too. The seed does not generate
+  ``CITATION.cff``, so a project adds one when it needs citation metadata.
 
 Release checklist
 -----------------
@@ -29,8 +30,8 @@ Every item must hold before a tag is created. A red item stops the release.
    dashboard passes on it.
 3. The changelog has an entry that names the version, the release commit, and the
    verification result.
-4. ``CITATION.cff``, and the package metadata of a project that is a package, name the
-   version being released.
+4. The version being released is named in each place the project records it: ``CITATION.cff``,
+   if the project has one, and the package metadata, if the project is a package.
 5. The release notes are a file in the repository, and the maintainer has read them.
 6. The approval names the version, the release commit, and each command below that it
    approves.
@@ -123,8 +124,9 @@ it, connect a GitHub account to Zenodo, then turn the repository on in Zenodo's 
 In an organization, the connecting account needs GitHub admin permission and Zenodo access
 to the organization.
 
-Each release's DOI is on its Zenodo record. Add the DOI to ``CITATION.cff`` in a follow-up
-commit, after the maintainer confirms it. A DOI cannot be reserved before the release.
+Each release's DOI is on its Zenodo record. If the project has a ``CITATION.cff``, add the
+DOI to it in a follow-up commit, after the maintainer confirms it. A DOI cannot be reserved
+before the release.
 Zenodo's FAQ describes a concept DOI, which covers all versions. Cite the concept DOI when
 readers should always get the latest version.
 
