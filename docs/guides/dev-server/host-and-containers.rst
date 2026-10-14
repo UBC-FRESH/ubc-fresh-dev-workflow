@@ -3,8 +3,8 @@ Host and containers
 
 This page covers the server, the base container, and one container per project. The
 installation steps follow the upstream LXD install page. The other commands are written
-from the LXD reference and have not been re-checked against it. The P2 scripts will
-re-check them. Names such as ``fresh-project-a`` and paths such as
+from the LXD reference and have not been re-checked against it. The P2 scripts reproduce
+these commands, and they do not check them against the LXD reference. Names such as ``fresh-project-a`` and paths such as
 ``/srv/projects/project-a`` are examples; replace them.
 
 Host requirements
@@ -22,9 +22,9 @@ Host requirements
 Install and initialize LXD
 --------------------------
 
-Run the read-only host checks first: ``server/host-check.sh``. It reports the state of the LXD
-snap, its channel, the ``lxd`` group, the daemon, and a storage pool. It changes nothing on the
-host.
+Run the read-only host checks first: `server/host-check.sh <https://github.com/UBC-FRESH/ubc-fresh-dev-workflow/blob/main/server/host-check.sh>`__.
+It reports the state of the LXD snap, its channel, the ``lxd`` group, the daemon, and a storage
+pool. It changes nothing on the host.
 
 Install the LXD snap, and add your user to the ``lxd`` group. The group change applies
 in new login sessions. ``newgrp`` applies it to the current shell:
@@ -50,9 +50,10 @@ Create the base container
 
 The base container holds the common tools and no project data. Each project copies it.
 
-``server/provision-base.sh --dry-run`` prints the commands below, in the same order, and runs
-none of them. ``server/provision-base.sh --apply`` runs them on a host, and a maintainer runs
-it. The login shell, the ``exit``, and the final stop stay manual.
+The script `server/provision-base.sh <https://github.com/UBC-FRESH/ubc-fresh-dev-workflow/blob/main/server/provision-base.sh>`__
+prints the commands below with ``--dry-run``, in the same order, and runs none of them.
+``--apply`` runs them on a host, and a maintainer runs it. The login shell, the ``exit``, and the
+final stop stay manual.
 
 .. code-block:: bash
 
@@ -79,7 +80,8 @@ Then install the GitHub CLI, code-server, OpenCode, and DataLad, as described in
 Create one container per project
 --------------------------------
 
-``server/new-project-container.sh --dry-run NAME WORKSPACE PORT`` prints the commands in this
+The script `server/new-project-container.sh <https://github.com/UBC-FRESH/ubc-fresh-dev-workflow/blob/main/server/new-project-container.sh>`__
+prints, with ``--dry-run NAME WORKSPACE PORT``, the commands in this
 section, and the workspace file that it writes, and it runs none of them. ``--apply`` runs them,
 and a maintainer runs it. Before any change, it stops if the name, the port, or the workspace
 file is already taken.
