@@ -38,4 +38,5 @@
 
 - [Onboarding](guides/onboarding.html): a guided tour for new people.
 - [Starting a new project](guides/first-project.html): from the seed to a reviewed first pull request.
+- [Release and deployment](guides/release.html): the release checklist, the tag, release, and Pages steps, PyPI for packages, and the archival DOI.
 - [FRESH-style dev server](guides/dev-server/index.html): the reference environment and its security notes.

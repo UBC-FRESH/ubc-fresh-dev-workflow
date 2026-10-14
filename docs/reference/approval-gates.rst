@@ -58,7 +58,7 @@ The rules in the table mean:
      - Only the branch that the approved report names, and only after its merge.
    * - Create a tag, a GitHub release, or a package publication
      - ask first
-     - The release playbook (planned, P3) will list the steps.
+     - The steps are in :doc:`../guides/release`.
    * - Change repository visibility, settings, the template flag, Pages, or branch protection
      - ask first
      - These change what the public sees. Each change is named with its command, and it
