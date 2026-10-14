@@ -79,6 +79,11 @@ Then install the GitHub CLI, code-server, OpenCode, and DataLad, as described in
 Create one container per project
 --------------------------------
 
+``server/new-project-container.sh --dry-run NAME WORKSPACE PORT`` prints the commands in this
+section, and the workspace file that it writes, and it runs none of them. ``--apply`` runs them,
+and a maintainer runs it. Before any change, it stops if the name, the port, or the workspace
+file is already taken.
+
 Copy the base for each new project, and start the copy:
 
 .. code-block:: bash
