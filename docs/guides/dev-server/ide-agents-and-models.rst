@@ -107,11 +107,7 @@ Start the agent from the project root, so that its working directory matches the
 Model choice is configuration
 -----------------------------
 
-- Choose a model for each kind of task, based on evidence from your own runs. Record the
-  choice and the evidence in the project's notes, and check the choice again when the
-  provider or the model changes.
-- At the time of writing, lab projects have used an open-weight reasoning model at its
-  highest reasoning setting, through OpenCode's gateway. Treat that as one data point,
-  not a rule.
-- Separate roles, such as planner, implementer, and reviewer, with instructions and
-  permissions. Do not expect one model to act as three independent reviewers.
+Choose a model for each kind of task, on evidence from your own runs, and record the choice in
+the log on :doc:`../../agents/roles-and-models`. That page also sets out the agent roles and
+the rule for choosing a model. Configure the chosen model in OpenCode's settings, as described
+in the OpenCode section above.

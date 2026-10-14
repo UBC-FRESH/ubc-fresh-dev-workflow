@@ -26,6 +26,7 @@
 - [RTFM protocol](agents/rtfm.html): how to read, cite, and fix the docs.
 - [Green dashboard](agents/green-dashboard.html): the rule for any change from full green.
 - [Embedded capabilities](agents/embedded-capabilities.html): the contract for validated, advisory capabilities, with a conformance checklist.
+- [Agent roles and models](agents/roles-and-models.html): the roles, the task families, the rule for choosing a model, and the log of each choice.
 
 ## API
 
