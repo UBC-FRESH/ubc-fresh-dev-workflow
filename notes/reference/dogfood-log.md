@@ -42,7 +42,7 @@ This log records what the first dogfood runs found: the synthetic demo project, 
 - Command: a read of `tmp/synthetic-demo/ROADMAP.md`, line 43. Exit status: not applicable, because it was a file read.
 - Output: `- [ ] P0.1 Create the GitHub repository and push the rendered seed`.
 - Cause: the seed's Phase 0 mixes local steps with a GitHub step. A local rehearsal cannot tick P0.1. The rehearsal used a local bare remote in its place, and the demo's changelog records that substitution.
-- Disposition: **deferred**. Separating the local steps from the GitHub steps changes the seed's contract, so it needs an ADR before any change.
+- Disposition: **fixed** in P3.1 (#34). ADR 0009 accepted Option A on 2026-10-14, and the seed's Phase 0 now holds only local tasks.
 - Issue: #25, filed in P1.3.
 
 ### F5. The demo's dashboard runs six gates, not eight
@@ -113,4 +113,4 @@ This log records what the first dogfood runs found: the synthetic demo project, 
 
 ## Open items
 
-None. Every entry has a disposition. F1 is fixed in `928223e`, F8 in `14f9cd2`, and F11 in the P1.6 closeout commit. F2, F5, F6, and F10 are accepted. F3, F4, F7, and F9 are deferred to #24, #25, #26, and #27.
+None. Every entry has a disposition. F1 is fixed in `928223e`, F8 in `14f9cd2`, F11 in the P1.6 closeout commit, and F4 in P3.1 under ADR 0009. F2, F5, F6, and F10 are accepted. F3, F7, and F9 are deferred to #24, #26, and #27.

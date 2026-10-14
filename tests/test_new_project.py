@@ -9,6 +9,7 @@ from pathlib import Path
 
 import pytest
 
+import check_workflow as cw
 import new_project as initializer
 
 TEXT_SUFFIXES: frozenset[str] = frozenset({".md", ".rst", ".txt", ".yml", ".py", ".cff", ".toml"})
@@ -68,6 +69,20 @@ def test_generated_project_passes_the_validator(tmp_path: Path) -> None:
     render_demo(dest)
     result = initializer.run_validator(dest)
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_generated_phase_0_holds_only_local_tasks(tmp_path: Path) -> None:
+    """Repository creation is an activation step, so the rendered Phase 0 has no GitHub task."""
+    dest = tmp_path / "demo"
+    render_demo(dest)
+    lines = (dest / "ROADMAP.md").read_text(encoding="utf-8").splitlines()
+    phase_0 = next(phase for phase in cw.parse_roadmap(lines) if phase.number == 0)
+    assert [(task.phase, task.number) for task in phase_0.tasks] == [(0, 1), (0, 2)]
+    start = phase_0.line - 1
+    following = [index for index in range(start + 1, len(lines)) if lines[index].startswith("## ")]
+    section = "\n".join(lines[start : following[0] if following else len(lines)]).lower()
+    assert "github" not in section
+    assert "repository" not in section
 
 
 def test_refuses_to_fill_a_non_empty_directory_without_force(tmp_path: Path) -> None:
