@@ -62,10 +62,15 @@ Continuous integration
 
 - The ``quality`` job runs on Python 3.11 and 3.12, for every pull request and every push
   to ``main``. It runs lint, format, types, tests, the validator, and the docs build. It
-  also generates a project from the seed and runs the same checks inside it.
+  also generates a project from the seed and runs the same checks inside it. It runs
+  ``shellcheck`` and ``bash -n`` on each script in ``server/``.
 - The ``dashboard`` job runs the dashboard and writes its table into the job summary. It
   uploads the JSON record as an artifact.
 - The ``pre-commit`` job runs every hook on the whole repository.
+- Every workflow runs on the pinned runner ``ubuntu-24.04``, and every action is a version whose
+  own metadata declares Node 24. The runner is pinned because GitHub moves ``ubuntu-latest`` to
+  Ubuntu 26 from 19 October 2026. ``tests/test_ci_workflows.py`` checks both rules, so a change
+  to ``ubuntu-latest`` or to an older action fails the dashboard.
 
 Required status checks (approved settings change)
 --------------------------------------------------
