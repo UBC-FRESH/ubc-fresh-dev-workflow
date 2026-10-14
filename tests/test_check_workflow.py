@@ -791,3 +791,19 @@ def test_a_path_under_an_ignored_directory_is_ignored(tmp_path: Path) -> None:
     rules = cw.load_ignore_rules(tmp_path)
     assert cw.is_ignored("build/keep.md", is_dir=False, rules=rules)
     assert not cw.is_ignored("keep.md", is_dir=False, rules=rules)
+
+
+def test_an_unsupported_negation_cannot_hide_a_file(tmp_path: Path) -> None:
+    """A negation the reader cannot apply cannot leave a file hidden by an earlier rule."""
+    root = make_repo(tmp_path)
+    write(root, ".gitignore", "*.log\n!important/**/audit.log\n")
+    write(root, "important/x/audit.log", f"Clone into {HOME_PREFIX}someone/projects\n")
+    assert "PATH-PERSONAL" in error_codes(root)
+
+
+def test_an_unsupported_negation_reincludes_every_path(tmp_path: Path) -> None:
+    """A negated line the reader cannot apply becomes one rule that re-includes every path."""
+    write(tmp_path, ".gitignore", "*.log\n!**/keep.log\n")
+    rules = cw.load_ignore_rules(tmp_path)
+    assert [rule.negated for rule in rules] == [False, True]
+    assert not cw.is_ignored("docs/keep.log", is_dir=False, rules=rules)

@@ -380,31 +380,56 @@ def _parse_ignore_line(line: str) -> IgnoreRule | None:
     Returns
     -------
     IgnoreRule or None
-        The rule. ``None`` for a blank line, a comment, and a line the reader does not apply: a
-        line with a backslash, a pattern with ``**``, a bare slash, and a bracket that is not a
-        valid character class. Not applying a rule scans more files, so it cannot hide a defect.
+        The rule. ``None`` for a blank line, a comment, and an ignore line the reader does not
+        apply: a line with a backslash, a pattern with ``**``, a bare slash, or a bracket that is
+        not a valid character class. Leaving out an ignore rule scans more files. A negated line
+        the reader does not apply becomes a rule that re-includes every path, so no earlier rule
+        can hide a file that git would include.
     """
     text = line.rstrip()
-    if not text or text.startswith("#") or "\\" in text:
+    if not text or text.startswith("#"):
         return None
     negated = text.startswith("!")
     if negated:
         text = text[1:]
     directory_only = text.endswith("/")
     text = text.rstrip("/")
-    if not text or "**" in text:
-        return None
+    if not text or "\\" in text or "**" in text:
+        return _unsupported(negated)
     anchored = "/" in text
     text = text.lstrip("/")
     try:
         pattern = re.compile(_glob_to_regex(text))
     except re.error:
-        return None
+        return _unsupported(negated)
     return IgnoreRule(
         pattern=pattern,
         anchored=anchored,
         directory_only=directory_only,
         negated=negated,
+    )
+
+
+def _unsupported(negated: bool) -> IgnoreRule | None:
+    """Return the conservative rule for a line that the reader cannot apply.
+
+    Parameters
+    ----------
+    negated : bool
+        Whether the line starts with ``!``.
+
+    Returns
+    -------
+    IgnoreRule or None
+        A rule that re-includes every path when the line is negated, and ``None`` otherwise.
+    """
+    if not negated:
+        return None
+    return IgnoreRule(
+        pattern=re.compile(r".*"),
+        anchored=False,
+        directory_only=False,
+        negated=True,
     )
 
 
@@ -465,7 +490,7 @@ def is_ignored(rel: str, *, is_dir: bool, rules: Sequence[IgnoreRule]) -> bool:
 
 
 def load_ignore_rules(root: Path) -> list[IgnoreRule]:
-    """Read the rules from the root ``.gitignore``, leaving out lines the reader cannot apply.
+    """Read the root ``.gitignore`` rules, with a conservative rule for each unsupported negation.
 
     Only the root file is read. A ``.gitignore`` in a subdirectory is not read, and neither is
     ``.git/info/exclude``, because the walk has no index to consult.

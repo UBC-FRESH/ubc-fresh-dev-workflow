@@ -83,8 +83,10 @@ finding carries a stable code, listed here:
 The validator scans the files that a commit would include. When the root is the top level of a
 git repository, these are the tracked files and the untracked files that git does not ignore.
 Otherwise, as in a generated project inside another repository, the validator walks the tree and
-skips the paths that the root ``.gitignore`` ignores. Only the root ``.gitignore`` is read. A line
-that the reader cannot apply is skipped, so the files that line would match are scanned.
+skips the paths that the root ``.gitignore`` ignores. Only the root ``.gitignore`` is read. An ignore line
+the reader cannot apply is skipped, so the files that line would match are scanned. A negated
+line the reader cannot apply re-includes every path, so no earlier rule hides a file that git
+would include.
 
 ``FILE-RECOMMENDED`` is the one warning. It names recommended files that are
 missing, such as a license. Warnings do not fail the run.
