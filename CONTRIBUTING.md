@@ -21,6 +21,10 @@ python -m pip install -r requirements-dev.txt
 pre-commit install
 ```
 
+The pre-commit hooks call `python` from `PATH`, so commit from a shell where the environment is
+active, as in the setup above. A commit from a shell without it runs the hooks in the system Python,
+which lacks the dev tools, and the hooks fail.
+
 ## The green dashboard
 
 The dashboard is the signal that every commit must keep green:

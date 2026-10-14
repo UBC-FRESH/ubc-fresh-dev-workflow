@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -12,6 +13,15 @@ import new_project as initializer
 
 TEXT_SUFFIXES: frozenset[str] = frozenset({".md", ".rst", ".txt", ".yml", ".py", ".cff", ".toml"})
 PLACEHOLDER: re.Pattern[str] = re.compile(r"\{\{[A-Z_]+\}\}")
+GATE_OUTPUTS: tuple[str, ...] = (
+    ".coverage",
+    ".coverage.worker",
+    "coverage.xml",
+    "htmlcov/index.html",
+    "runtime/dashboard.json",
+    ".hypothesis/constants/cache",
+)
+GIT_REQUIRED = pytest.mark.skipif(shutil.which("git") is None, reason="git is not installed")
 
 
 def render_demo(dest: Path, *, force: bool = False) -> list[Path]:
@@ -194,3 +204,22 @@ def test_command_line_returns_one_when_the_generated_project_fails(
     monkeypatch.setattr(initializer, "run_validator", failing)
     assert initializer.main(["--name", "Demo", "--dest", str(tmp_path / "demo")]) == 1
     assert "failed validation" in capsys.readouterr().err
+
+
+@GIT_REQUIRED
+def test_generated_project_ignores_the_files_its_gates_write(tmp_path: Path) -> None:
+    """A new project's git repository ignores the coverage, runtime, and Hypothesis outputs."""
+    dest = tmp_path / "demo"
+    render_demo(dest)
+    subprocess.run(["git", "-C", str(dest), "init", "-q"], check=True)
+    for rel in GATE_OUTPUTS:
+        target = dest / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text("output\n", encoding="utf-8")
+    for rel in GATE_OUTPUTS:
+        check = subprocess.run(
+            ["git", "-C", str(dest), "check-ignore", "-q", rel],
+            capture_output=True,
+            check=False,
+        )
+        assert check.returncode == 0, f"{rel} is not ignored by the generated project"

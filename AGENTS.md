@@ -87,7 +87,7 @@ Details: [typing and docstrings](docs/reference/typing-and-docstrings.rst).
   fail, and each one asserts a specific behavior.
 - Keep the layers: unit tests for each function, contract tests for public interfaces, integration
   tests that run the command-line tools, property tests for invariants, and the seed self-check.
-- The coverage gate is 90 percent branch coverage of `scripts/`. Aim near 100 percent. Do not chase
+- The coverage gate is 95 percent branch coverage of `scripts/`. Aim near 100 percent. Do not chase
   the number with tests that assert nothing.
 
 Details: [testing policy](docs/reference/testing-policy.rst).

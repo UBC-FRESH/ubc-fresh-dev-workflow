@@ -26,7 +26,7 @@ The gates
      - Strict type checking of ``scripts/``, ``tests/``, and ``docs/conf.py``.
    * - ``tests``
      - ``python -m pytest``
-     - Every test passes, and branch coverage of ``scripts/`` meets the gate of 90 percent.
+     - Every test passes, and branch coverage of ``scripts/`` meets the gate of 95 percent.
    * - ``validator``
      - ``python scripts/check_workflow.py``
      - The planning surfaces follow the workflow: roadmap grammar, changelog order, links,

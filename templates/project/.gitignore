@@ -5,6 +5,14 @@ __pycache__/
 .ruff_cache/
 .mypy_cache/
 
+# Coverage, runtime, and Hypothesis records
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+runtime/
+.hypothesis/
+
 # Environments
 .venv/
 venv/

@@ -37,9 +37,12 @@ The lifecycle
        the branch, and the report is refreshed to name the new head commit.
      - maintainer
    * - Execute
-     - Squash-merge the pull request, and delete its branch. Close the parent issue with a
-       closeout comment that cites the merge commit. Apply each approved settings change,
-       and read it back.
+     - Squash-merge the pull request. Then confirm that the squash commit's tree equals the
+       approved head, and delete the branch, locally and on its remote. Git refuses
+       ``branch -d`` after a squash merge unless the branch tracks its remote. If git refuses,
+       stop and report, and do not force-delete the branch without a new approval. Close the
+       parent issue with a closeout comment that cites the merge commit. Apply each approved
+       settings change, and read it back.
      - agent
    * - Launch
      - Switch to ``main`` and update it. Create the next phase's branch. In its first
