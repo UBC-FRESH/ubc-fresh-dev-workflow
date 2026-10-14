@@ -10,7 +10,7 @@ This roadmap is the plan of record and the issue tracker map for this repository
 | P1 Dogfood and validation | #9 | `feature/p1-dogfood-validation` | complete |
 | P2 Dev server kit | #10 | `feature/p2-dev-server-kit` | complete |
 | P3 Lifecycle playbooks and deployment | #11 | `feature/p3-lifecycle-playbooks` | complete |
-| P4 v0.1.0 public release and onboarding | #12 | `feature/p4-v0.1.0-release` | active |
+| P4 v0.1.0 public release and onboarding | #12 | `feature/p4-v0.1.0-release` | pr-open |
 | P5 Maintenance and feedback loop | #13 | `feature/p5-maintenance-loop` | planned |
 
 ## Lifecycle Map
@@ -178,7 +178,7 @@ Phase 3 verification:
 
 Parent issue: #12
 Branch: `feature/p4-v0.1.0-release`
-Status: active
+Status: pr-open
 
 Goal: publish v0.1.0 as a public template, with live docs and an onboarding path for collaborators.
 
@@ -228,7 +228,7 @@ Goal: keep the seed current: triage incoming ideas, review it on a cadence, and 
    - Data management: private vaults, DataLad and git-annex, and sanitized artifacts. Raw transcripts stay local.
    - Model routing: model choices are configuration. Each one is recorded with its evidence, and each one is re-checked at the P5.2 review.
    - Snap channel: the dev server guide names `latest/stable`, the channel that `server/host-check.sh` expects.
-8. Phase 4 is active. Its parent is #12, and it was launched from `fa94b69` on `feature/p4-v0.1.0-release`. Its child tasks are P4.1 to P4.3, on #39 to #41, linked as sub-issues of #12. P4.1 is complete: the release candidate notes are in `notes/releases/v0.1.0.md`, and `CITATION.cff` names version 0.1.0. P4.2 and P4.3 need approval.
+8. Phase 4 is queued for approval (`pr-open`), with the close-out report in `notes/reports/p4-closeout.md`. Its parent is #12, and it was launched from `fa94b69` on `feature/p4-v0.1.0-release`. Its child tasks are P4.1 to P4.3, on #39 to #41, linked as sub-issues of #12. P4.1 is complete: the release candidate notes are in `notes/releases/v0.1.0.md`, and `CITATION.cff` names version 0.1.0. P4.2 and P4.3 need approval.
 9. Decisions recorded at the Phase 3 close-out, approved on 2026-10-14:
    - The seed does not ship the lifecycle, release, data, or roles pages in v0.1.0. They stay in this repository's docs, and P5.3 can revisit it.
    - The release notes go in `notes/releases/v0.1.0.md`, and the release command names that file.
