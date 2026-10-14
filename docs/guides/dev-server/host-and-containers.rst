@@ -50,6 +50,10 @@ Create the base container
 
 The base container holds the common tools and no project data. Each project copies it.
 
+``server/provision-base.sh --dry-run`` prints the commands below, in the same order, and runs
+none of them. ``server/provision-base.sh --apply`` runs them on a host, and a maintainer runs
+it. The login shell, the ``exit``, and the final stop stay manual.
+
 .. code-block:: bash
 
    lxc launch ubuntu:24.04 fresh-base
