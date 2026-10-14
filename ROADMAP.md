@@ -8,7 +8,7 @@ This roadmap is the plan of record and the issue tracker map for this repository
 | --- | --- | --- | --- |
 | P0 Bootstrap scaffold | #1 | `feature/p0-bootstrap-scaffold` | complete |
 | P1 Dogfood and validation | #9 | `feature/p1-dogfood-validation` | complete |
-| P2 Dev server kit | #10 | `feature/p2-dev-server-kit` | active |
+| P2 Dev server kit | #10 | `feature/p2-dev-server-kit` | pr-open |
 | P3 Lifecycle playbooks and deployment | #11 | `feature/p3-lifecycle-playbooks` | planned |
 | P4 v0.1.0 public release and onboarding | #12 | `feature/p4-v0.1.0-release` | planned |
 | P5 Maintenance and feedback loop | #13 | `feature/p5-maintenance-loop` | planned |
@@ -135,7 +135,7 @@ Phase 1 verification:
 
 Parent issue: #10
 Branch: `feature/p2-dev-server-kit`
-Status: active
+Status: pr-open
 
 Goal: turn the dev server guide into idempotent helper scripts with a dry-run mode, shellcheck-clean and tested in CI.
 
@@ -192,7 +192,7 @@ Goal: keep the seed current: triage incoming ideas, review it on a cadence, and 
 
 1. Phase 0 is complete. Pull request #17 merged as `2943d83`, GitHub Pages is live, branch protection requires the four CI checks on `main`, and #1 is closed.
 2. Phase 1 is complete. Pull request #28 merged as `8f063fb`, and #9 is closed. P1.1 to P1.6 are complete, and their records are on #18 to #23. The findings deferred from the dogfood log are on #24, #25, #26, and #27, with the decisions in item 5.
-3. Phase 2 is active on `feature/p2-dev-server-kit`, with the parent #10. Its child tasks are P2.1 to P2.4, on #29 to #32, linked as sub-issues of #10. All four Phase 2 tasks are complete, and the Phase 2 close-out is next. Phase 2 closes with its own close-out report, queued in a pull request for the maintainer's approval, on the same contract as Phase 1.
+3. Phase 2 is queued for approval (`pr-open`) in pull request #33, with the parent #10. Its child tasks are P2.1 to P2.4, on #29 to #32, linked as sub-issues of #10. All four Phase 2 tasks are complete. The close-out report is `notes/reports/p2-closeout.md`, and it requests approval of four items. Phase 2 closes with its own close-out report, queued in a pull request for the maintainer's approval, on the same contract as Phase 1.
 4. Recommended defaults, as approved with the Phase 0 close-out. The Phase 1 report can change them:
    - Seed issue forms (YAML) stay deferred. The default is Markdown templates, until the friction log shows the need.
    - `scripts/new_project.py` keeps writing local files only. Creating a repository stays a separate approved action.
