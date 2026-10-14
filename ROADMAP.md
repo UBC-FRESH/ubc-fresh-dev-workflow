@@ -7,7 +7,7 @@ This roadmap is the plan of record and the issue tracker map for this repository
 | Phase | Parent issue | Branch | Status |
 | --- | --- | --- | --- |
 | P0 Bootstrap scaffold | #1 | `feature/p0-bootstrap-scaffold` | complete |
-| P1 Dogfood and validation | #9 | `feature/p1-dogfood-validation` | active |
+| P1 Dogfood and validation | #9 | `feature/p1-dogfood-validation` | pr-open |
 | P2 Dev server kit | #10 | `feature/p2-dev-server-kit` | planned |
 | P3 Lifecycle playbooks and deployment | #11 | `feature/p3-lifecycle-playbooks` | planned |
 | P4 v0.1.0 public release and onboarding | #12 | `feature/p4-v0.1.0-release` | planned |
@@ -105,7 +105,7 @@ Phase 0 verification:
 
 Parent issue: #9
 Branch: `feature/p1-dogfood-validation`
-Status: active
+Status: pr-open
 
 Goal: prove the seed works end to end on a throwaway project. Run the loop once, record every failure, and fix or file each one.
 
@@ -184,7 +184,7 @@ Goal: keep the seed current: triage incoming ideas, review it on a cadence, and 
 ## Detailed Next Steps Notes
 
 1. Phase 0 is complete. Pull request #17 merged as `2943d83`, GitHub Pages is live, branch protection requires the four CI checks on `main`, and #1 is closed.
-2. Phase 1 is active. Its child tasks are #18 to #23, under the parent #9. P1.1 to P1.6 are complete. Their records are on #18 to #23. The findings deferred from the dogfood log are on #24, #25, #26, and #27. The next step is Phase 1's own close-out report, `notes/reports/p1-closeout.md`, which the next move queues in a pull request for the maintainer's approval.
+2. Phase 1 is queued for approval (`pr-open`) in pull request #28. Its child tasks are #18 to #23, under the parent #9. P1.1 to P1.6 are complete. Their records are on #18 to #23. The findings deferred from the dogfood log are on #24, #25, #26, and #27. The close-out report is `notes/reports/p1-closeout.md`, and it requests approval of four items.
 3. Phase 1 closes with its own close-out report, `notes/reports/p1-closeout.md`, queued in a pull request. The maintainer approves the report. Then the agent squash-merges the pull request, closes #9, and deletes the branch.
 4. Recommended defaults, as approved with the Phase 0 close-out. The Phase 1 report can change them:
    - Seed issue forms (YAML) stay deferred. The default is Markdown templates, until the friction log shows the need.
