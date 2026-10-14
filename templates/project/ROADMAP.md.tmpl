@@ -20,11 +20,12 @@ Every phase starts as `planned` with `Parent issue: TBD`. Activate a phase only 
 
 | Stage | Phases | Exit criteria |
 | --- | --- | --- |
-| Scope and design | P0, P1 | Goal, scope, and out-of-scope items recorded; first decisions in ADRs |
-| Build | P2, P3 | Contracts defined; tasks committed with task IDs |
-| Verify | P4 | Checks pass; evidence recorded in the changelog |
-| Release and deploy | P5 | Tagged release; published docs verified from a clean checkout |
-| Operate and maintain | P6 | Review cadence held; incoming ideas triaged |
+| Scope and design | P0, P1 | Goal, scope, and out-of-scope items recorded; decisions in ADRs, each accepted or deferred |
+| Build | P2, P3 | Each task committed with its task ID; each commit leaves the dashboard green; docs updated in the same change set |
+| Verify | P4 | The dashboard and CI pass on the head commit; each acceptance criterion has evidence in the close-out report |
+| Release and deploy | P5 | Tag, release notes, and Pages live; a clean checkout verifies them; each release action approved on its own |
+| Operate and maintain | P6 | Review cadence held; incoming ideas triaged; retirement decided and recorded as an ADR |
+| Retire | P6 (procedure) | Archive notice, final changelog entry, and issues closed |
 
 ## Conventions
 
@@ -43,6 +44,10 @@ Goal: adapt the contract to this project, and make the first pull request review
 - [ ] P0.1 Adapt `AGENTS.md` and `README.md` to this project
 - [ ] P0.2 Confirm the validator and the docs build pass
 
+Acceptance criteria:
+
+- <State the criterion that shows this phase met its goal.>
+
 ## Phase 1: Scope and design
 
 Parent issue: TBD
@@ -53,6 +58,10 @@ Goal: state the question, the users, the scope, and the out-of-scope items. Reco
 
 - [ ] P1.1 Write the problem statement and scope in `notes/`
 - [ ] P1.2 Record the first design decisions as ADRs in `notes/adr/`
+
+Acceptance criteria:
+
+- <State the criterion that shows this phase met its goal.>
 
 ## Phase 2: Contracts and prototype
 
@@ -65,6 +74,10 @@ Goal: define the interfaces and data contracts, then build the smallest prototyp
 - [ ] P2.1 Define the interface and data contracts in `docs/`
 - [ ] P2.2 Build a prototype that exercises the contracts on synthetic data
 
+Acceptance criteria:
+
+- <State the criterion that shows this phase met its goal.>
+
 ## Phase 3: Build
 
 Parent issue: TBD
@@ -75,6 +88,10 @@ Goal: implement the agreed scope, one task at a time, on the phase branch.
 
 - [ ] P3.1 Implement the first build task
 
+Acceptance criteria:
+
+- <State the criterion that shows this phase met its goal.>
+
 ## Phase 4: Verify
 
 Parent issue: TBD
@@ -84,6 +101,10 @@ Status: planned
 Goal: show that the build meets its acceptance criteria, and record the evidence in the changelog.
 
 - [ ] P4.1 Run the acceptance checks and record the evidence
+
+Acceptance criteria:
+
+- <State the criterion that shows this phase met its goal.>
 
 ## Phase 5: Release and deploy
 
@@ -96,6 +117,10 @@ Goal: tag a release, publish the docs, and verify the published artifacts from a
 - [ ] P5.1 Write the release notes and the known-gaps list
 - [ ] P5.2 Tag, publish, and verify from a clean checkout (maintainer approval required)
 
+Acceptance criteria:
+
+- <State the criterion that shows this phase met its goal.>
+
 ## Phase 6: Operate and maintain
 
 Parent issue: TBD
@@ -105,6 +130,10 @@ Status: planned
 Goal: keep the project current: triage incoming ideas, review on a cadence, and close out cleanly.
 
 - [ ] P6.1 Set a review cadence and record the first review
+
+Acceptance criteria:
+
+- <State the criterion that shows this phase met its goal.>
 
 ## Detailed Next Steps Notes
 

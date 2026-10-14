@@ -159,7 +159,7 @@ Status: active
 
 Goal: give each lifecycle stage an exit gate, and write the release, data-management, and agent-roles playbooks.
 
-- [ ] P3.1 Lifecycle stage gates and exit criteria (#34)
+- [x] P3.1 Lifecycle stage gates and exit criteria (#34)
 - [ ] P3.2 Release and deployment playbook (#35)
 - [ ] P3.3 Data management playbook (#36)
 - [ ] P3.4 Agent roles and model routing playbook (#37)
@@ -214,7 +214,7 @@ Goal: keep the seed current: triage incoming ideas, review it on a cadence, and 
    - F7, #26: the dev-tool pins are decided with P5.3, the seed versioning and migration policy.
    - F9, #27: the acceptance criteria for the seed's roadmap template fold into P3.1.
    - CI runner: done in P2.4, on the phase branch, before the phase pull request opens. That pull request's CI runs on the pinned runner, so no separate pull request is needed.
-6. Phase 3 is active. Its parent is #11, and it was launched from `f998cd8` on `feature/p3-lifecycle-playbooks`. Its child tasks are P3.1 to P3.4, on #34 to #37, linked as sub-issues of #11. P3.1 starts in a later move.
+6. Phase 3 is active. Its parent is #11, and it was launched from `f998cd8` on `feature/p3-lifecycle-playbooks`. Its child tasks are P3.1 to P3.4, on #34 to #37, linked as sub-issues of #11. P3.1 is complete, and P3.2 starts in a later move.
 7. Decisions recorded at the Phase 2 close-out, approved on 2026-10-14:
    - Lifecycle stages: the six stages named in #11. The maintainer owns every gate, and the agent prepares the evidence.
    - Tags, releases, and Pages: none in Phase 3. The release playbook names their commands, and each one waits for its own approval.
