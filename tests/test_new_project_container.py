@@ -129,6 +129,15 @@ def test_the_dry_run_prints_the_guides_per_project_commands(tmp_path: Path) -> N
     assert not (workspace / "fresh-project-a.code-workspace").exists()
 
 
+def test_the_dry_run_plans_a_workspace_that_does_not_exist_yet(tmp_path: Path) -> None:
+    """A dry run only plans, so the workspace need not exist. --apply still requires it."""
+    missing = tmp_path / "not-yet"
+    result, commands = run_script(tmp_path, {}, "--dry-run", NAME, str(missing), PORT)
+    assert result.returncode == 0, result.stderr
+    assert f"source={missing}" in result.stdout
+    assert commands == []
+
+
 def test_apply_creates_the_container_and_writes_a_valid_workspace_file(tmp_path: Path) -> None:
     """A free name and port give a copied, started container and a valid .code-workspace file."""
     workspace = make_workspace(tmp_path)

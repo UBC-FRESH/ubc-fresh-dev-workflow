@@ -12,7 +12,7 @@ permissions:
 jobs:
   quality:
     name: Quality gates, Python ${{ matrix.python-version }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -22,10 +22,10 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
@@ -47,6 +47,18 @@ jobs:
       - name: Tests with coverage gate
         run: python -m pytest
 
+      - name: Install shellcheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+
+      - name: Check the server scripts
+        run: |
+          shellcheck server/*.sh
+          for script in server/*.sh; do
+            bash -n "$script"
+          done
+
       - name: Validate workflow surfaces
         run: python scripts/check_workflow.py
 
@@ -65,14 +77,14 @@ jobs:
 
   dashboard:
     name: Green dashboard summary
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
@@ -94,21 +106,21 @@ jobs:
 
       - name: Upload the dashboard record
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: dashboard-record
           path: runtime/dashboard.json
 
   pre-commit:
     name: Pre-commit parity
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip

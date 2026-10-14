@@ -140,7 +140,7 @@ fi
 if [[ $WORKSPACE != /* ]]; then
     bad_args "WORKSPACE must be an absolute path"
 fi
-if [[ ! -d $WORKSPACE ]]; then
+if [[ $MODE == --apply && ! -d $WORKSPACE ]]; then
     bad_args "WORKSPACE must be an existing directory"
 fi
 
