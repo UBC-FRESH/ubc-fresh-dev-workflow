@@ -9,4 +9,5 @@ Guides are task-oriented. Each one tells a person what to do, in order.
    onboarding
    first-project
    release
+   data-management
    dev-server/index

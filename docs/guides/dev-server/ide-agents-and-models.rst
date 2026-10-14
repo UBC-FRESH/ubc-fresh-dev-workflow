@@ -69,8 +69,8 @@ environment, not into the system Python:
    . .venv/bin/activate
    python -m pip install datalad
 
-Keep private data in private repositories or vaults. Public repositories hold sanitized
-artifacts only.
+Keep private data in vaults, and keep public repositories to sanitized artifacts. The data
+management guide, :doc:`../data-management`, sets out the rules.
 
 OpenCode: the agent CLI
 -----------------------
