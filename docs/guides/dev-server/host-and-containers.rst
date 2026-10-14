@@ -22,6 +22,10 @@ Host requirements
 Install and initialize LXD
 --------------------------
 
+Run the read-only host checks first: ``server/host-check.sh``. It reports the state of the LXD
+snap, its channel, the ``lxd`` group, the daemon, and a storage pool. It changes nothing on the
+host.
+
 Install the LXD snap, and add your user to the ``lxd`` group. The group change applies
 in new login sessions. ``newgrp`` applies it to the current shell:
 
