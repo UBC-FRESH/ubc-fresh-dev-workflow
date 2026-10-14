@@ -50,6 +50,7 @@ GATE_PAGES: tuple[str, ...] = (
     "AGENTS.md",
     "docs/reference/testing-policy.rst",
     "docs/reference/quality-gates.rst",
+    "templates/project/AGENTS.md.tmpl",
 )
 
 
