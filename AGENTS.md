@@ -134,6 +134,20 @@ in the report, with its exact command.
 
 Details: [phase close-out](docs/reference/phase-closeout.rst) and [approval gates](docs/reference/approval-gates.rst).
 
+## Blocking pings
+
+Use an agent-owned Basecamp identity, not the maintainer's account, to send an
+asynchronous ping when you cannot continue without a human decision or approval.
+Ping only for blockers: MFA or device approval, an expired credential, a scope
+decision, or a failure the logs do not explain. Do not ping for routine progress,
+and do not poll or send duplicates while waiting.
+
+Include the project and task, the exact blocker, the action needed, the verified
+state, and any expiry. Never put passwords, tokens, device codes, or verification
+codes in a ping.
+
+Details: [Basecamp pings for blocking decisions](docs/agents/basecamp-pings.rst).
+
 ## GitHub hygiene
 
 - Audit read-only first: `gh issue list`, `gh issue view <n>`, `gh pr list`.

@@ -13,4 +13,5 @@ reads them too, because they define what the agent may do.
    rtfm
    green-dashboard
    embedded-capabilities
+   basecamp-pings
    roles-and-models
