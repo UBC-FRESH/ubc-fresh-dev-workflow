@@ -110,3 +110,16 @@ Newest entries last. Each milestone gets a dated entry that matches the roadmap 
 ## 2026-10-30
 
 - Added the Basecamp ping policy for blocking decisions. `docs/agents/basecamp-pings.rst` defines the agent-owned identity, the normal OAuth fallback when agent connections are unavailable, the message contract, the no-polling rule, and the secret-handling rule. `AGENTS.md` links to it, and the page is in the agents toctree and `docs/llms.txt`. The policy was exercised against a real Basecamp account; a test ping was posted and read back with the agent identity as creator. No credentials, account IDs, or private paths are recorded in the repository. Validator: `python scripts/check_workflow.py` → 0 errors, 0 warnings.
+
+## 2026-11-04
+
+- Added `notes/reference/light-touch-web-app-agent-hardening.md`. It records the
+  reusable pattern from the FRESH x IRSS demo: static-first deployment, opt-in
+  same-origin assistant, a dedicated read-only agent with full workspace access
+  and a fail-closed shell search allowlist, `--standalone` provider invocation
+  without `--auto`, registry/notes retrieval, local-docs and canonical-repo
+  citations, safe Markdown, and the tests that keep those choices from drifting.
+  It also states the trust model, the “not a sandbox” caveat, and the conditions
+  that would require escalation beyond this light-touch pattern.
+  Dashboard result on the rebased head: **GREEN** on all eight gates; 205 tests
+  pass.
